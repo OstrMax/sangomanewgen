@@ -1,0 +1,832 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: #ffffff;
+  --color-foreground: #001221;
+  --color-primary-025: #E8EDF5;
+  --color-primary-900: #0B182E;
+  --color-black-050: #F2F2F3;
+  --color-black-100: #E5E6E8;
+  --color-black-200: #CCCFD2;
+  --color-black-500: #7F888F;
+  --color-black-600: #4C5863;
+  --color-black-900: #001221;
+  --color-success-400: #2CAD43;
+  --color-warning-400: #FCC624;
+  --color-warning-500: #FBBD00;
+  --color-green: #34C759;
+  --color-sidebar-bg: #2a1051;
+  --color-sidebar-active: #783a9b;
+  --color-sidebar-gradient-start: rgb(41, 15, 79);
+  --color-sidebar-gradient-mid1: rgb(112, 22, 156);
+  --color-sidebar-gradient-mid2: rgb(132, 25, 178);
+  --color-sidebar-gradient-end: rgb(180, 10, 131);
+  --font-inter: "Inter", sans-serif;
+  --font-manrope: "Manrope", sans-serif;
+}
+
+/* Theme CSS variables */
+:root {
+  --th-bg: #ffffff;
+  --th-bg-elevated: #ffffff;
+  --th-bg-card: #ffffff;
+  --th-bg-hover: #F2F2F3;
+  --th-bg-input: #ffffff;
+  --th-border: #E5E6E8;
+  --th-border-light: #F2F2F3;
+  --th-divider: #E5E6E8;
+  --th-text-primary: #001221;
+  --th-text-secondary: #4C5863;
+  --th-text-muted: #7F888F;
+  --th-search-bg: rgba(255,255,255,0.8);
+  --th-search-bg-hover: #ffffff;
+  --th-search-border: transparent;
+  --th-dropdown-bg: #ffffff;
+  --th-dropdown-border: #E5E6E8;
+  --th-dropdown-divider: #E5E6E8;
+  --th-dropdown-shadow: 0 8px 30px rgba(0,0,0,0.12);
+  --th-scrollbar-thumb: #CCCFD2;
+  --th-tab-active: #2a1051;
+  --th-message-bg: #F2F2F3;
+  --th-message-own-bg: #E8EDF5;
+  --th-message-border: transparent;
+  --th-badge-bg: #F2F2F3;
+  --th-active-conv-bg: #E8EDF5;
+  --th-active-conv-border: #2a1051;
+  --th-icon-fill: #112547;
+  --th-quick-actions-bg: rgba(29,62,119,0.04);
+  --th-topbar-bg: #2a1051;
+  --th-topbar-border: rgba(255,255,255,0.1);
+  --th-shell-bg: linear-gradient(180deg, rgb(41, 15, 79) 0%, rgb(112, 22, 156) 33%, rgb(132, 25, 178) 64.5%, rgb(180, 10, 131) 100%);
+  --th-sidebar-active: #783a9b;
+  --th-sidebar-badge-border: #831ab1;
+  --th-status-dot-border: #2a1051;
+  --th-walkthrough-bg: #001221;
+  --th-walkthrough-border: transparent;
+  --th-text-disabled: #CCCFD2;
+  --th-chart-bar: rgba(0,18,33,0.8);
+  --th-chart-bar-light: rgba(0,18,33,0.6);
+  --th-chart-bar-hover: rgba(0,18,33,0.95);
+  --th-chart-bar-light-hover: rgba(0,18,33,0.75);
+  --th-meet-btn-new: rgba(156,50,140,0.08);
+  --th-meet-btn-alt: rgba(36,76,145,0.04);
+  --th-meet-label-new: #5b074e;
+  --th-meet-label-alt: #244c91;
+  --th-meet-btn-border: transparent;
+  --th-call-card-bg: #001221;
+  --th-call-card-border: transparent;
+  --th-call-card-text: #ffffff;
+  --th-call-card-muted: rgba(255,255,255,0.6);
+  --th-call-btn-bg: #ffffff;
+  --th-call-btn-text: #001221;
+  --th-call-action-bg: rgba(255,255,255,0.1);
+  --th-badge-external-bg: #ebd6e8;
+  --th-badge-external-text: #9c328c;
+  --th-badge-internal-bg: #d4edda;
+  --th-badge-internal-text: #28a745;
+  --th-fax-cta-bg: #001221;
+  --th-fax-cta-text: #ffffff;
+}
+
+[data-theme="dark"] {
+  --th-fax-cta-bg: #ffffff;
+  --th-fax-cta-text: #001221;
+  --th-bg: #001221;
+  --th-bg-elevated: #0B182E;
+  --th-bg-card: #0B182E;
+  --th-bg-hover: rgba(255,255,255,0.06);
+  --th-bg-input: #001221;
+  --th-border: #112547;
+  --th-border-light: #142B53;
+  --th-divider: #142B53;
+  --th-text-primary: #ffffff;
+  --th-text-secondary: #8B95A0;
+  --th-text-muted: #7F888F;
+  --th-search-bg: #001221;
+  --th-search-bg-hover: #0B182E;
+  --th-search-border: #112547;
+  --th-dropdown-bg: #0B182E;
+  --th-dropdown-border: #112547;
+  --th-dropdown-divider: #142B53;
+  --th-dropdown-shadow: 0 1px 12px rgba(0,0,0,0.16);
+  --th-scrollbar-thumb: #142B53;
+  --th-tab-active: #ffffff;
+  --th-message-bg: transparent;
+  --th-message-own-bg: #0B182E;
+  --th-message-border: #112547;
+  --th-badge-bg: #0B182E;
+  --th-active-conv-bg: #0B182E;
+  --th-active-conv-border: #112547;
+  --th-icon-fill: #ffffff;
+  --th-quick-actions-bg: rgba(29,62,119,0.12);
+  --th-topbar-bg: #0B182E;
+  --th-topbar-border: #112547;
+  --th-shell-bg: #0B182E;
+  --th-sidebar-active: #142B53;
+  --th-sidebar-badge-border: #0B182E;
+  --th-status-dot-border: #001221;
+  --th-walkthrough-bg: #142B53;
+  --th-walkthrough-border: #1e3a6e;
+  --th-text-disabled: #3a4a5a;
+  --th-chart-bar: rgba(255,255,255,0.7);
+  --th-chart-bar-light: rgba(255,255,255,0.45);
+  --th-chart-bar-hover: rgba(255,255,255,0.85);
+  --th-chart-bar-light-hover: rgba(255,255,255,0.6);
+  --th-meet-btn-new: rgba(156,50,140,0.1);
+  --th-meet-btn-alt: rgba(36,76,145,0.1);
+  --th-meet-label-new: #ffffff;
+  --th-meet-label-alt: #ffffff;
+  --th-meet-btn-border: #112547;
+  --th-call-card-bg: #0B182E;
+  --th-call-card-border: #112547;
+  --th-call-card-text: #ffffff;
+  --th-call-card-muted: rgba(255,255,255,0.5);
+  --th-call-btn-bg: rgba(255,255,255,0.12);
+  --th-call-btn-text: #ffffff;
+  --th-call-action-bg: rgba(255,255,255,0.08);
+  --th-badge-external-bg: rgba(156,50,140,0.2);
+  --th-badge-external-text: #e0a0d8;
+  --th-badge-internal-bg: rgba(52,199,89,0.2);
+  --th-badge-internal-text: #6ee7a0;
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-inter);
+  font-feature-settings: "cv11", "ss01", "ss03";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.005em;
+  margin: 0;
+  overflow: hidden;
+}
+
+/* Inputs, buttons, and form controls inherit body font */
+input, button, textarea, select {
+  font-family: inherit;
+  letter-spacing: inherit;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--th-scrollbar-thumb);
+  border-radius: 3px;
+}
+
+/* Range slider track */
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 3px;
+  border-radius: 2px;
+}
+input[type="range"]::-moz-range-track {
+  height: 3px;
+  border-radius: 2px;
+}
+/* Range slider thumb */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--th-text-primary);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  margin-top: -5.5px;
+}
+input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--th-text-primary);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-12px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(52, 199, 89, 0.4); }
+  70% { box-shadow: 0 0 0 6px rgba(52, 199, 89, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(52, 199, 89, 0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(24px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes expandDown {
+  from { opacity: 0; max-height: 0; }
+  to { opacity: 1; max-height: 500px; }
+}
+
+/* ── macOS-inspired micro-interactions ── */
+
+/* Spring-bounce on press for primary buttons */
+@keyframes springPress {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.95); }
+  75% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
+@keyframes springIn {
+  0% { transform: scale(0.9); opacity: 0; }
+  60% { transform: scale(1.03); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes gentlePulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(46, 16, 85, 0); }
+  50% { box-shadow: 0 0 0 4px rgba(46, 16, 85, 0.08); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Primary button — macOS style */
+.btn-primary {
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  overflow: hidden;
+}
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 18, 33, 0.15), 0 1px 3px rgba(0, 18, 33, 0.1);
+}
+.btn-primary:active {
+  transform: translateY(0) scale(0.97);
+  box-shadow: 0 1px 2px rgba(0, 18, 33, 0.1);
+  transition-duration: 0.1s;
+}
+
+/* CTA button — Meet/Join/Schedule with glow */
+.btn-cta {
+  transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+}
+.btn-cta:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(46, 16, 85, 0.2), 0 2px 8px rgba(46, 16, 85, 0.1);
+}
+.btn-cta:active {
+  transform: translateY(0) scale(0.96);
+  box-shadow: 0 2px 4px rgba(46, 16, 85, 0.1);
+  transition-duration: 0.1s;
+}
+
+/* Card hover — macOS window lift effect */
+.card-lift {
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.card-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+.card-lift:active {
+  transform: translateY(0);
+  transition-duration: 0.1s;
+}
+
+/* Icon button — macOS toolbar button */
+.btn-icon {
+  transition: all 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.btn-icon:hover {
+  background-color: var(--th-bg-hover);
+  transform: scale(1.05);
+}
+.btn-icon:active {
+  transform: scale(0.92);
+  transition-duration: 0.08s;
+}
+
+/* Chip/tag — macOS segmented control feel */
+.chip-interactive {
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.chip-interactive:hover {
+  transform: scale(1.03);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+.chip-interactive:active {
+  transform: scale(0.97);
+  transition-duration: 0.08s;
+}
+
+/* Call button — macOS green button glow */
+.btn-call {
+  transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.btn-call:hover {
+  transform: scale(1.06);
+  box-shadow: 0 0 20px rgba(52, 199, 89, 0.4), 0 4px 12px rgba(52, 199, 89, 0.2);
+}
+.btn-call:active {
+  transform: scale(0.92);
+  box-shadow: 0 0 8px rgba(52, 199, 89, 0.3);
+  transition-duration: 0.08s;
+}
+
+/* End call button — red glow */
+.btn-end-call {
+  transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.btn-end-call:hover {
+  transform: scale(1.06);
+  box-shadow: 0 0 20px rgba(199, 8, 22, 0.4), 0 4px 12px rgba(199, 8, 22, 0.2);
+}
+.btn-end-call:active {
+  transform: scale(0.92);
+  transition-duration: 0.08s;
+}
+
+/* AI feature button — gradient shimmer on hover */
+.btn-ai {
+  transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  background-size: 200% 100%;
+}
+.btn-ai:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(174, 13, 138, 0.12), 0 1px 4px rgba(47, 17, 85, 0.08);
+  background-position: 100% 0;
+}
+.btn-ai:active {
+  transform: translateY(0) scale(0.97);
+  transition-duration: 0.1s;
+}
+
+/* Tab underline — smooth slide */
+.tab-indicator {
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Modal/dialog entrance — macOS sheet animation */
+@keyframes modalIn {
+  0% { opacity: 0; transform: scale(0.95) translateY(10px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+.modal-enter {
+  animation: modalIn 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Toast — slide in from the right with a gentle spring */
+@keyframes toastIn {
+  0% { opacity: 0; transform: translateX(24px) scale(0.98); }
+  100% { opacity: 1; transform: translateX(0) scale(1); }
+}
+.toast-enter {
+  animation: toastIn 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Dropdown menu — macOS popover */
+@keyframes popoverIn {
+  0% { opacity: 0; transform: scale(0.95) translateY(-4px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+.popover-enter {
+  animation: popoverIn 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Smooth focus ring — macOS blue glow */
+.focus-ring:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(46, 16, 85, 0.2);
+  transition: box-shadow 0.15s ease;
+}
+
+/* ── Unified easing curve for ad-hoc transitions ── */
+/* Use !important to override Tailwind's default transition-timing-function
+   on every transition-* utility for consistent macOS spring feel. */
+.transition-all,
+.transition-colors,
+.transition-opacity,
+.transition-shadow,
+.transition-transform {
+  transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+}
+
+/* ── Sidebar tabs — glass morphism + smooth interactions ────────────────── */
+
+/* Tab container: smooth scale + spring on hover/press */
+.sidebar-tab {
+  transition:
+    transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    filter 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform;
+}
+.sidebar-tab:hover {
+  transform: translateZ(0);
+  filter: brightness(1.05);
+}
+.sidebar-tab:active {
+  transform: scale(0.95);
+  transition-duration: 0.1s;
+}
+
+/* Glass surface — frosted glass that fades in on hover, stays on active.
+   Opacities at 70% of original (subtler), shadows softened.
+   No white inset top-line on active state. */
+.sidebar-tab__surface {
+  background: linear-gradient(180deg, rgba(255,255,255,0.13) 0%, rgba(255,255,255,0.04) 100%);
+  /* Tailwind v4 sets backdrop-filter on every element via *,::before,::after.
+     Use !important so our actual blur wins. */
+  backdrop-filter: blur(12px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(140%) !important;
+  border: 1px solid rgba(255,255,255,0.13);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.10);
+  opacity: 0;
+  transform: scale(0.92);
+  transition:
+    opacity 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.sidebar-tab:hover .sidebar-tab__surface {
+  opacity: 1;
+  transform: scale(1);
+}
+.sidebar-tab[data-active="true"] .sidebar-tab__surface {
+  opacity: 1;
+  transform: scale(1);
+  background: linear-gradient(180deg, rgba(255,255,255,0.20) 0%, rgba(255,255,255,0.07) 100%);
+  border-color: rgba(255,255,255,0.20);
+  box-shadow: 0 5px 14px rgba(0,0,0,0.13);
+}
+
+/* Icon: subtle bounce on hover, brighten on active */
+.sidebar-tab__icon {
+  opacity: 0.75;
+  transition:
+    opacity 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1),
+    filter 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.sidebar-tab:hover .sidebar-tab__icon {
+  opacity: 0.95;
+  transform: translateY(-1px);
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25));
+}
+.sidebar-tab[data-active="true"] .sidebar-tab__icon {
+  opacity: 1;
+  transform: translateY(-1px);
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.3));
+}
+
+/* Label — color & weight transition */
+.sidebar-tab__label {
+  transition:
+    color 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.sidebar-tab:hover .sidebar-tab__label {
+  color: rgba(255,255,255,0.95);
+}
+.sidebar-tab[data-active="true"] .sidebar-tab__label {
+  color: #ffffff;
+}
+
+/* Keyboard focus ring — clear, accessible */
+.sidebar-tab:focus-visible {
+  outline: none;
+}
+.sidebar-tab:focus-visible .sidebar-tab__surface {
+  opacity: 1;
+  transform: scale(1);
+  box-shadow:
+    0 0 0 2px rgba(255,255,255,0.40),
+    0 5px 14px rgba(0,0,0,0.13);
+}
+
+/* ── Dial pad keys — unified across Talk + Operator Console ─────────────── */
+/* Soft glass surface on hover, springy press, ring-style focus.
+   Adapts to light & dark mode via CSS vars. */
+.dial-key {
+  position: relative;
+  background: transparent;
+  border: 1px solid var(--th-border);
+  color: var(--th-text-primary);
+  transition:
+    transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    background-color 0.18s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    border-color 0.18s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform;
+}
+.dial-key:hover {
+  background-color: var(--th-bg-hover);
+  border-color: var(--th-text-muted);
+  transform: translateY(-1px);
+  box-shadow:
+    0 4px 12px rgba(0,0,0,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.6);
+}
+[data-theme="dark"] .dial-key:hover {
+  box-shadow:
+    0 4px 12px rgba(0,0,0,0.40),
+    inset 0 1px 0 rgba(255,255,255,0.06);
+}
+.dial-key:active {
+  transform: scale(0.94);
+  transition-duration: 0.08s;
+  box-shadow:
+    inset 0 2px 4px rgba(0,0,0,0.10),
+    0 1px 2px rgba(0,0,0,0.05);
+}
+[data-theme="dark"] .dial-key:active {
+  box-shadow:
+    inset 0 2px 4px rgba(0,0,0,0.30),
+    0 1px 2px rgba(0,0,0,0.20);
+}
+.dial-key:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px var(--th-bg-hover),
+    0 0 0 4px var(--th-text-muted);
+}
+
+/* ── AI Assist toggle button (header) — glass + glow halo ───────────────── */
+.ai-toggle {
+  position: relative;
+  transition:
+    transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+    filter 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform;
+}
+.ai-toggle::before {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.20) 0%, rgba(255,255,255,0.04) 100%);
+  backdrop-filter: blur(8px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(140%) !important;
+  border: 1px solid rgba(255,255,255,0.18);
+  opacity: 0;
+  transform: scale(0.85);
+  transition:
+    opacity 0.20s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none;
+  z-index: -1;
+}
+.ai-toggle:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.1);
+}
+.ai-toggle:hover::before,
+.ai-toggle[data-active="true"]::before {
+  opacity: 1;
+  transform: scale(1);
+}
+.ai-toggle[data-active="true"]::before {
+  background: linear-gradient(135deg, rgba(255,255,255,0.30) 0%, rgba(255,255,255,0.08) 100%);
+  border-color: rgba(255,255,255,0.30);
+  box-shadow: 0 0 18px rgba(255,255,255,0.20);
+}
+.ai-toggle:active {
+  transform: scale(0.92);
+  transition-duration: 0.08s;
+}
+.ai-toggle:focus-visible {
+  outline: none;
+}
+.ai-toggle:focus-visible::before {
+  opacity: 1;
+  transform: scale(1);
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.55);
+}
+
+/* ── Composer — chat & SMS message input row (frosted glass) ────────────── */
+.glass-composer {
+  position: relative;
+  background: linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.30) 100%);
+  backdrop-filter: blur(14px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(160%) !important;
+  border: 1px solid var(--th-border);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.65),
+    0 1px 2px rgba(0,0,0,0.04),
+    0 4px 16px rgba(0,0,0,0.05);
+  transition:
+    border-color 0.20s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    box-shadow 0.20s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    background 0.20s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.glass-composer:hover {
+  border-color: var(--th-text-muted);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.70),
+    0 1px 2px rgba(0,0,0,0.05),
+    0 6px 22px rgba(0,0,0,0.07);
+}
+.glass-composer:focus-within {
+  border-color: var(--th-tab-active);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.70),
+    0 0 0 3px var(--th-bg-hover),
+    0 4px 16px rgba(0,0,0,0.05);
+}
+[data-theme="dark"] .glass-composer {
+  background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+  border-color: rgba(255,255,255,0.08);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.04),
+    0 4px 16px rgba(0,0,0,0.30);
+}
+[data-theme="dark"] .glass-composer:hover {
+  border-color: rgba(255,255,255,0.14);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.06),
+    0 6px 22px rgba(0,0,0,0.40);
+}
+[data-theme="dark"] .glass-composer:focus-within {
+  border-color: var(--th-tab-active);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.06),
+    0 0 0 3px rgba(255,255,255,0.05),
+    0 6px 22px rgba(0,0,0,0.40);
+}
+
+/* Send button — glass-feel lift on hover, springy press */
+.glass-send {
+  position: relative;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.30),
+    0 4px 12px rgba(80, 16, 130, 0.25);
+  transition:
+    transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    filter 0.18s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform;
+}
+.glass-send:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.40),
+    0 6px 18px rgba(80, 16, 130, 0.40);
+}
+.glass-send:active {
+  transform: scale(0.94);
+  transition-duration: 0.08s;
+  box-shadow:
+    inset 0 2px 4px rgba(0,0,0,0.20),
+    0 1px 3px rgba(80, 16, 130, 0.20);
+}
+.glass-send:focus-visible {
+  outline: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.30),
+    0 0 0 3px rgba(174, 13, 138, 0.35),
+    0 4px 12px rgba(80, 16, 130, 0.25);
+}
+
+/* ── Tooltip utility ────────────────────────────────────────────────────── */
+/* Add `data-tip="Your label"` to any element to get a smooth dark tooltip.
+   Optional `data-tip-pos="bottom" | "left" | "right"` (default top). */
+[data-tip] {
+  position: relative;
+}
+[data-tip]::after,
+[data-tip]::before {
+  pointer-events: none;
+  opacity: 0;
+  z-index: 100;
+  transition:
+    opacity 0.16s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px) scale(0.96);
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  background: rgba(15, 23, 42, 0.96);
+  color: #fff;
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.22);
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
+[data-tip]::before {
+  content: "";
+  position: absolute;
+  bottom: calc(100% + 3px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  border: 5px solid transparent;
+  border-top-color: rgba(15, 23, 42, 0.96);
+}
+[data-tip]:hover::after,
+[data-tip]:focus-visible::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0) scale(1);
+  transition-delay: 0.45s;
+}
+[data-tip]:hover::before,
+[data-tip]:focus-visible::before {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  transition-delay: 0.45s;
+}
+
+/* Position variants */
+[data-tip-pos="bottom"]::after {
+  bottom: auto;
+  top: calc(100% + 8px);
+  transform: translateX(-50%) translateY(-4px) scale(0.96);
+}
+[data-tip-pos="bottom"]::before {
+  bottom: auto;
+  top: calc(100% + 3px);
+  border-top-color: transparent;
+  border-bottom-color: rgba(15, 23, 42, 0.96);
+  transform: translateX(-50%) translateY(-4px);
+}
+[data-tip-pos="bottom"]:hover::after,
+[data-tip-pos="bottom"]:focus-visible::after {
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+[data-tip-pos="bottom"]:hover::before,
+[data-tip-pos="bottom"]:focus-visible::before {
+  transform: translateX(-50%) translateY(0);
+}
+
+[data-tip-pos="right"]::after {
+  bottom: auto;
+  top: 50%;
+  left: calc(100% + 8px);
+  transform: translateY(-50%) translateX(-4px) scale(0.96);
+}
+[data-tip-pos="right"]::before {
+  bottom: auto;
+  top: 50%;
+  left: calc(100% + 3px);
+  border-top-color: transparent;
+  border-right-color: rgba(15, 23, 42, 0.96);
+  transform: translateY(-50%) translateX(-4px);
+}
+[data-tip-pos="right"]:hover::after,
+[data-tip-pos="right"]:focus-visible::after {
+  transform: translateY(-50%) translateX(0) scale(1);
+}
+[data-tip-pos="right"]:hover::before,
+[data-tip-pos="right"]:focus-visible::before {
+  transform: translateY(-50%) translateX(0);
+}
+
+[data-tip-pos="left"]::after {
+  bottom: auto;
+  top: 50%;
+  left: auto;
+  right: calc(100% + 8px);
+  transform: translateY(-50%) translateX(4px) scale(0.96);
+}
+[data-tip-pos="left"]::before {
+  bottom: auto;
+  top: 50%;
+  left: auto;
+  right: calc(100% + 3px);
+  border-top-color: transparent;
+  border-left-color: rgba(15, 23, 42, 0.96);
+  transform: translateY(-50%) translateX(4px);
+}
+[data-tip-pos="left"]:hover::after,
+[data-tip-pos="left"]:focus-visible::after {
+  transform: translateY(-50%) translateX(0) scale(1);
+}
+[data-tip-pos="left"]:hover::before,
+[data-tip-pos="left"]:focus-visible::before {
+  transform: translateY(-50%) translateX(0);
+}
