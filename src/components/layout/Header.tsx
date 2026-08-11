@@ -8,6 +8,7 @@ import CustomizeTabsDialog from "@/components/layout/CustomizeTabsDialog";
 import WhiteLabelDialog from "@/components/layout/WhiteLabelDialog";
 import FaxSettingsDialog from "@/components/layout/FaxSettingsDialog";
 import { PassiveAIIcon, ActiveAIIcon } from "@/components/ai/AIAssistPanel";
+import { asset } from "@/lib/asset";
 
 export default function Header({
   aiPanelOpen,
@@ -41,7 +42,7 @@ export default function Header({
     <div className="flex items-center gap-1 px-3 py-1 w-full h-11 shrink-0">
       {/* Grid/channels icon */}
       <button data-tip="Apps & channels" data-tip-pos="bottom" className="p-1.5 rounded hover:bg-white/10 transition-colors">
-        <Image src="/icons/channels.svg" alt="Apps" width={22} height={22} />
+        <Image src={asset("/icons/channels.svg")} alt="Apps" width={22} height={22} />
       </button>
 
       <div className="flex-1" />
@@ -55,7 +56,7 @@ export default function Header({
           boxShadow: "0 1px 2px rgba(0,0,0,0.08)",
         }}
       >
-        <Image src="/icons/search.svg" alt="Search" width={16} height={16} className="opacity-70 group-hover:opacity-100 transition-opacity" />
+        <Image src={asset("/icons/search.svg")} alt="Search" width={16} height={16} className="opacity-70 group-hover:opacity-100 transition-opacity" />
         <span className="ml-2 text-sm" style={{ color: "var(--th-text-muted)" }}>Search</span>
       </button>
 
@@ -80,17 +81,17 @@ export default function Header({
 
         {/* Help */}
         <button data-tip="Help & support" data-tip-pos="bottom" className="p-1.5 rounded hover:bg-white/10 transition-colors">
-          <Image src="/icons/help.svg" alt="Help" width={24} height={24} />
+          <Image src={asset("/icons/help.svg")} alt="Help" width={24} height={24} />
         </button>
 
         {/* Mentions */}
         <button data-tip="Mentions" data-tip-pos="bottom" className="p-1.5 rounded hover:bg-white/10 transition-colors">
-          <Image src="/icons/mentions.svg" alt="Mentions" width={24} height={24} />
+          <Image src={asset("/icons/mentions.svg")} alt="Mentions" width={24} height={24} />
         </button>
 
         {/* Notifications */}
         <button data-tip="Notifications" data-tip-pos="bottom" className="p-1.5 rounded hover:bg-white/10 transition-colors">
-          <Image src="/icons/notifications.svg" alt="Notifications" width={24} height={24} />
+          <Image src={asset("/icons/notifications.svg")} alt="Notifications" width={24} height={24} />
         </button>
 
         {/* Settings */}
@@ -101,7 +102,7 @@ export default function Header({
             data-tip-pos="bottom"
             className="p-1.5 rounded hover:bg-white/10 transition-colors"
           >
-            <Image src="/icons/settings.svg" alt="Settings" width={24} height={24} />
+            <Image src={asset("/icons/settings.svg")} alt="Settings" width={24} height={24} />
           </button>
           {showSettings && (
             <SettingsDropdown

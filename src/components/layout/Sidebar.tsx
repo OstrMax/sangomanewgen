@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
+import { asset } from "@/lib/asset";
 
 export type NavItem = {
   icon: string;
@@ -12,6 +13,7 @@ export type NavItem = {
   iconSize: number;
   extraPy?: boolean;
   badge?: boolean;
+  unread?: boolean;
 };
 
 export const defaultNavItems: NavItem[] = [
@@ -21,7 +23,7 @@ export const defaultNavItems: NavItem[] = [
   { icon: "/icons/operator-console.svg", label: "Operator\nconsole", href: "/operator", iconSize: 32, extraPy: true },
   { icon: "/icons/meet.svg", label: "Meet", href: "/meet", iconSize: 24 },
   { icon: "/icons/sms.svg", label: "SMS", href: "/sms", iconSize: 24 },
-  { icon: "/icons/fax.svg", label: "Fax", href: "/fax", iconSize: 24 },
+  { icon: "/icons/fax.svg", label: "Fax", href: "/fax", iconSize: 24, unread: true },
   { icon: "/icons/calendar.svg", label: "Calendar", href: "/calendar", iconSize: 24 },
   { icon: "/icons/files.svg", label: "Files", href: "/files", iconSize: 24 },
   { icon: "/icons/contact-center.svg", label: "CX", href: "/contact-center", iconSize: 24, badge: true },
@@ -80,7 +82,7 @@ export default function Sidebar() {
     <div className="flex flex-col items-center gap-1 w-16 h-full pb-2 shrink-0">
       {/* Logo */}
       <Link href="/" className="flex items-center justify-center w-full h-12 pt-4 pb-3.5 overflow-hidden">
-        <Image src="/icons/logo.png" alt="TeamHub" width={36} height={24} priority />
+        <Image src={asset("/icons/logo.png")} alt="TeamHub" width={36} height={24} priority />
       </Link>
 
       {navItems.map((item) => {
@@ -102,7 +104,7 @@ export default function Sidebar() {
               className="sidebar-tab__surface absolute inset-0 rounded-xl pointer-events-none"
             />
             <Image
-              src={item.icon}
+              src={asset(item.icon)}
               alt={item.label}
               width={item.iconSize}
               height={item.iconSize}
@@ -118,6 +120,12 @@ export default function Sidebar() {
             {item.badge && (
               <span
                 className="absolute top-[6px] right-[10px] w-2.5 h-2.5 bg-[#fcc624] rounded-full z-20"
+                style={{ border: "2px solid var(--th-sidebar-badge-border)" }}
+              />
+            )}
+            {item.unread && (
+              <span
+                className="absolute top-[6px] right-[10px] w-2.5 h-2.5 bg-[#ff4d6d] rounded-full z-20"
                 style={{ border: "2px solid var(--th-sidebar-badge-border)" }}
               />
             )}

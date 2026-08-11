@@ -53,6 +53,7 @@
   --th-message-border: transparent;
   --th-badge-bg: #F2F2F3;
   --th-active-conv-bg: #E8EDF5;
+  --th-unread-bg: #EEF2F8;
   --th-active-conv-border: #2a1051;
   --th-icon-fill: #112547;
   --th-quick-actions-bg: rgba(29,62,119,0.04);
@@ -117,6 +118,7 @@
   --th-message-border: #112547;
   --th-badge-bg: #0B182E;
   --th-active-conv-bg: #0B182E;
+  --th-unread-bg: #08172B;
   --th-active-conv-border: #112547;
   --th-icon-fill: #ffffff;
   --th-quick-actions-bg: rgba(29,62,119,0.12);

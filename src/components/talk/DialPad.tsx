@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import CallPopup from "./CallPopup";
+import { asset } from "@/lib/asset";
 
 /* ── Speaker / Volume icon ── */
 const SpeakerIcon = () => (
@@ -95,7 +96,7 @@ export default function DialPad() {
           onClick={handleCall}
           className={`w-14 h-14 rounded-full bg-[#2CAD43] hover:bg-[#259c3a] flex items-center justify-center transition-all shadow-lg ${input.length > 0 ? "active:scale-90" : "opacity-60 cursor-not-allowed"}`}
         >
-          <Image src="/icons/call-button.svg" alt="Call" width={22} height={23} />
+          <Image src={asset("/icons/call-button.svg")} alt="Call" width={22} height={23} />
         </button>
       </div>
     </>
