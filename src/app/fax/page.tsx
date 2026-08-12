@@ -69,7 +69,7 @@ export default function FaxPage() {
   const [search, setSearch] = useState("");
   const [showMoreFolders, setShowMoreFolders] = useState(false);
   const [folders, setFolders] = useState<Folder[]>(initialFolders);
-  const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
+  const [faxFilter, setFaxFilter] = useState<"all" | "unread">("all");
   const [sortOpen, setSortOpen] = useState(false);
 
   // dialogs / overlays
@@ -102,11 +102,6 @@ export default function FaxPage() {
   };
 
   const visibleFaxes = useMemo(() => {
-    const faxTime = (f: FaxItem) => {
-      if (f.date.startsWith("Today")) return Date.now();
-      const d = new Date(`${f.date} ${f.time}`);
-      return isNaN(d.getTime()) ? 0 : d.getTime();
-    };
     let list: FaxItem[];
     if (isSystem) list = faxes.filter((f) => f.box === view);
     else list = faxes.filter((f) => f.folderId === view);
@@ -117,8 +112,8 @@ export default function FaxPage() {
           f.number.toLowerCase().includes(search.toLowerCase()) ||
           f.subject.toLowerCase().includes(search.toLowerCase())
       )
-      .sort((a, b) => (sortOrder === "newest" ? faxTime(b) - faxTime(a) : faxTime(a) - faxTime(b)));
-  }, [view, isSystem, search, sortOrder]);
+      .filter((f) => (faxFilter === "unread" ? !!f.unread && !readIds.has(f.id) : true));
+  }, [view, isSystem, search, faxFilter, readIds]);
 
   const selected = faxes.find((f) => f.id === selectedId) || null;
   const unreadCount = faxes.filter((f) => f.box === "inbox" && f.unread && !readIds.has(f.id)).length;
@@ -216,8 +211,8 @@ export default function FaxPage() {
 
           {/* Search */}
           <div className="flex items-center gap-2" data-fax-tour="search">
-            <div className="flex items-center gap-2 px-3 h-9 rounded-lg flex-1" style={{ backgroundColor: "var(--th-bg-hover)" }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7F888F" strokeWidth="2"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+            <div className="fax-search flex items-center gap-2 px-3 h-9 rounded-lg flex-1" style={{ backgroundColor: "var(--th-search-field-bg)" }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--th-text-secondary)" strokeWidth="2"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
               <input
                 type="text"
                 placeholder="Search faxes"
@@ -241,7 +236,7 @@ export default function FaxPage() {
               <button
                 onClick={() => setSortOpen((v) => !v)}
                 className="btn-icon flex items-center justify-center w-9 h-9 rounded-lg"
-                style={{ backgroundColor: sortOpen ? "var(--th-icon-active-bg)" : "var(--th-bg-hover)" }}
+                style={{ backgroundColor: sortOpen || faxFilter !== "all" ? "var(--th-icon-active-bg)" : "var(--th-bg-hover)" }}
                 data-tip="Sort by"
                 data-tip-pos="bottom"
               >
@@ -251,15 +246,16 @@ export default function FaxPage() {
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setSortOpen(false)} />
                   <div className="absolute right-0 mt-1.5 w-44 rounded-xl overflow-hidden z-50 py-1" style={{ backgroundColor: "var(--th-dropdown-bg)", border: "1px solid var(--th-dropdown-border)", boxShadow: "var(--th-dropdown-shadow)" }}>
-                    {([["newest", "Newest first"], ["oldest", "Oldest first"]] as const).map(([id, label]) => (
+                    <div className="px-3.5 pt-1.5 pb-1 text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--th-text-muted)" }}>Sort by</div>
+                    {([["all", "All faxes"], ["unread", "Unread only"]] as const).map(([id, label]) => (
                       <button
                         key={id}
-                        onClick={() => { setSortOrder(id); setSortOpen(false); }}
+                        onClick={() => { setFaxFilter(id); setSortOpen(false); }}
                         className="w-full flex items-center justify-between px-3.5 py-2 text-[13px] font-medium transition-colors"
-                        style={{ color: "var(--th-text-primary)", backgroundColor: sortOrder === id ? "var(--th-bg-hover)" : "transparent" }}
+                        style={{ color: "var(--th-text-primary)", backgroundColor: faxFilter === id ? "var(--th-bg-hover)" : "transparent" }}
                       >
                         {label}
-                        {sortOrder === id && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--th-fax-cta-bg)" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>}
+                        {faxFilter === id && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--th-fax-cta-bg)" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>}
                       </button>
                     ))}
                   </div>
@@ -280,8 +276,8 @@ export default function FaxPage() {
                   onClick={() => switchView(box)}
                   className="chip-interactive flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-[0.25px] transition-all"
                   style={{
-                    backgroundColor: active ? "var(--th-bg-hover)" : "transparent",
-                    color: active ? "var(--th-tab-active)" : "var(--th-text-secondary)",
+                    backgroundColor: active ? "var(--th-icon-active-bg)" : "transparent",
+                    color: active ? "var(--th-icon-hover-fg)" : "var(--th-text-secondary)",
                   }}
                 >
                   {active && (
@@ -314,11 +310,11 @@ export default function FaxPage() {
               >
                 <span
                   className="w-[18px] h-[18px] shrink-0 rounded-[5px] flex items-center justify-center transition-colors"
-                  style={{ border: allChecked ? "none" : "1.5px solid var(--th-border)", backgroundColor: allChecked ? "var(--th-fax-cta-bg)" : "transparent" }}
+                  style={{ border: allChecked ? "none" : "1.5px solid var(--th-checkbox-border)", backgroundColor: allChecked ? "var(--th-fax-cta-bg)" : "transparent" }}
                 >
                   {allChecked && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--th-fax-cta-text)" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>}
                 </span>
-                <span className="text-[11px] font-semibold uppercase tracking-[0.4px] transition-colors group-hover:opacity-80" style={{ color: "var(--th-text-muted)" }}>
+                <span className="text-[11px] font-semibold uppercase tracking-[0.4px] transition-colors group-hover:opacity-80" style={{ color: "var(--th-text-secondary)" }}>
                   Select all ({selectedCount})
                 </span>
               </button>
@@ -362,12 +358,12 @@ export default function FaxPage() {
                   <div
                     onClick={() => switchView(f.id)}
                     className="w-full flex items-center gap-2.5 px-2 py-1.5 rounded-lg text-left transition-colors cursor-pointer"
-                    style={{ backgroundColor: active ? "var(--th-bg-hover)" : "transparent" }}
-                    onMouseEnter={(e) => { if (!active) e.currentTarget.style.backgroundColor = "var(--th-bg-hover)"; }}
+                    style={{ backgroundColor: active ? "var(--th-icon-active-bg)" : "transparent" }}
+                    onMouseEnter={(e) => { if (!active) e.currentTarget.style.backgroundColor = "var(--th-icon-hover-bg)"; }}
                     onMouseLeave={(e) => { if (!active) e.currentTarget.style.backgroundColor = "transparent"; }}
                   >
-                    <FolderIcon kind={f.kind} />
-                    <span className="flex-1 text-[13px] font-medium truncate" style={{ color: "var(--th-text-primary)" }}>{f.name}</span>
+                    <FolderIcon kind={f.kind} active={active} />
+                    <span className="flex-1 text-[13px] font-medium truncate" style={{ color: active ? "var(--th-icon-hover-fg)" : "var(--th-text-primary)" }}>{f.name}</span>
                     {canManage ? (
                       <>
                         <span className={`text-[12px] ${folderMenu === f.id ? "hidden" : "group-hover:hidden"}`} style={{ color: "var(--th-text-muted)" }}>{f.count}</span>
@@ -545,7 +541,7 @@ function FaxRow({ fax, selected, unread, checked, onSelect, onCheck }: { fax: Fa
       <button
         onClick={(e) => { e.stopPropagation(); onCheck(); }}
         className="mt-0.5 w-[18px] h-[18px] shrink-0 rounded-[5px] flex items-center justify-center transition-colors"
-        style={{ border: checked ? "none" : "1.5px solid var(--th-border)", backgroundColor: checked ? "var(--th-fax-cta-bg)" : "transparent" }}
+        style={{ border: checked ? "none" : "1.5px solid var(--th-checkbox-border)", backgroundColor: checked ? "var(--th-fax-cta-bg)" : "transparent" }}
       >
         {checked && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--th-fax-cta-text)" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>}
       </button>
@@ -585,8 +581,8 @@ function StatusBadge({ status }: { status: FaxStatus }) {
   );
 }
 
-function FolderIcon({ kind }: { kind: Folder["kind"] }) {
-  const stroke = "var(--th-text-secondary)";
+function FolderIcon({ kind, active }: { kind: Folder["kind"]; active?: boolean }) {
+  const stroke = active ? "var(--th-icon-hover-fg)" : "var(--th-text-secondary)";
   if (kind === "trash")
     return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="1.6"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" /></svg>;
   return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="1.6"><path d="M3 7h6l2 2h10v10a1 1 0 01-1 1H3a1 1 0 01-1-1V7a1 1 0 011-1z" /></svg>;

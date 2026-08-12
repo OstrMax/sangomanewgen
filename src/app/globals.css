@@ -37,6 +37,11 @@
   --th-icon-active-bg: #E8EDF5;
   --th-icon-hover-fg: #142B53;
   --th-tooltip-bg: #001221;
+  /* Fax panel resting states (Figma node 8396-222410) */
+  --th-search-field-bg: #E8EDF5;
+  --th-search-field-border: #E5E6E8;
+  --th-search-field-focus: #001221;
+  --th-checkbox-border: #99A0A6;
   --th-bg-input: #ffffff;
   --th-border: #E5E6E8;
   --th-border-light: #F2F2F3;
@@ -58,7 +63,7 @@
   --th-message-border: transparent;
   --th-badge-bg: #F2F2F3;
   --th-active-conv-bg: #E8EDF5;
-  --th-unread-bg: #EEF2F8;
+  --th-unread-bg: #E8EDF5;
   --th-active-conv-border: #2a1051;
   --th-icon-fill: #112547;
   --th-quick-actions-bg: rgba(29,62,119,0.04);
@@ -106,6 +111,10 @@
   --th-icon-active-bg: rgba(255,255,255,0.14);
   --th-icon-hover-fg: #E8EDF5;
   --th-tooltip-bg: #0B182E;
+  --th-search-field-bg: #0B182E;
+  --th-search-field-border: #112547;
+  --th-search-field-focus: #ffffff;
+  --th-checkbox-border: #4C5863;
   --th-bg-input: #001221;
   --th-border: #112547;
   --th-border-light: #142B53;
@@ -341,6 +350,15 @@ input[type="range"]::-moz-range-thumb {
   --th-text-muted: var(--th-icon-hover-fg);
   transform: scale(0.92);
   transition-duration: 0.08s;
+}
+
+/* Fax search field — resting + focused outline (Figma node 8396-222410) */
+.fax-search {
+  border: 1px solid var(--th-search-field-border);
+  transition: border-color 0.15s ease;
+}
+.fax-search:focus-within {
+  border-color: var(--th-search-field-focus);
 }
 
 /* Chip/tag — macOS segmented control feel */
