@@ -69,6 +69,8 @@ export default function FaxPage() {
   const [search, setSearch] = useState("");
   const [showMoreFolders, setShowMoreFolders] = useState(false);
   const [folders, setFolders] = useState<Folder[]>(initialFolders);
+  const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
+  const [sortOpen, setSortOpen] = useState(false);
 
   // dialogs / overlays
   const [compose, setCompose] = useState<null | { mode: "new" }>(null);
@@ -100,16 +102,23 @@ export default function FaxPage() {
   };
 
   const visibleFaxes = useMemo(() => {
+    const faxTime = (f: FaxItem) => {
+      if (f.date.startsWith("Today")) return Date.now();
+      const d = new Date(`${f.date} ${f.time}`);
+      return isNaN(d.getTime()) ? 0 : d.getTime();
+    };
     let list: FaxItem[];
     if (isSystem) list = faxes.filter((f) => f.box === view);
     else list = faxes.filter((f) => f.folderId === view);
-    return list.filter(
-      (f) =>
-        f.contact.toLowerCase().includes(search.toLowerCase()) ||
-        f.number.toLowerCase().includes(search.toLowerCase()) ||
-        f.subject.toLowerCase().includes(search.toLowerCase())
-    );
-  }, [view, isSystem, search]);
+    return list
+      .filter(
+        (f) =>
+          f.contact.toLowerCase().includes(search.toLowerCase()) ||
+          f.number.toLowerCase().includes(search.toLowerCase()) ||
+          f.subject.toLowerCase().includes(search.toLowerCase())
+      )
+      .sort((a, b) => (sortOrder === "newest" ? faxTime(b) - faxTime(a) : faxTime(a) - faxTime(b)));
+  }, [view, isSystem, search, sortOrder]);
 
   const selected = faxes.find((f) => f.id === selectedId) || null;
   const unreadCount = faxes.filter((f) => f.box === "inbox" && f.unread && !readIds.has(f.id)).length;
@@ -206,7 +215,7 @@ export default function FaxPage() {
           </div>
 
           {/* Search */}
-          <div className="flex items-center" data-fax-tour="search">
+          <div className="flex items-center gap-2" data-fax-tour="search">
             <div className="flex items-center gap-2 px-3 h-9 rounded-lg flex-1" style={{ backgroundColor: "var(--th-bg-hover)" }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7F888F" strokeWidth="2"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
               <input
@@ -226,6 +235,36 @@ export default function FaxPage() {
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--th-text-secondary)" strokeWidth="2" strokeLinecap="round"><line x1="4" y1="21" x2="4" y2="14" /><line x1="4" y1="10" x2="4" y2="3" /><line x1="12" y1="21" x2="12" y2="12" /><line x1="12" y1="8" x2="12" y2="3" /><line x1="20" y1="21" x2="20" y2="16" /><line x1="20" y1="12" x2="20" y2="3" /><line x1="1" y1="14" x2="7" y2="14" /><line x1="9" y1="8" x2="15" y2="8" /><line x1="17" y1="16" x2="23" y2="16" /></svg>
               </button>
+            </div>
+            {/* Sort by */}
+            <div className="relative shrink-0">
+              <button
+                onClick={() => setSortOpen((v) => !v)}
+                className="btn-icon flex items-center justify-center w-9 h-9 rounded-lg"
+                style={{ backgroundColor: sortOpen ? "var(--th-icon-active-bg)" : "var(--th-bg-hover)" }}
+                data-tip="Sort by"
+                data-tip-pos="bottom"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--th-text-secondary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="6" x2="20" y2="6" /><line x1="6" y1="12" x2="18" y2="12" /><line x1="9" y1="18" x2="15" y2="18" /></svg>
+              </button>
+              {sortOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setSortOpen(false)} />
+                  <div className="absolute right-0 mt-1.5 w-44 rounded-xl overflow-hidden z-50 py-1" style={{ backgroundColor: "var(--th-dropdown-bg)", border: "1px solid var(--th-dropdown-border)", boxShadow: "var(--th-dropdown-shadow)" }}>
+                    {([["newest", "Newest first"], ["oldest", "Oldest first"]] as const).map(([id, label]) => (
+                      <button
+                        key={id}
+                        onClick={() => { setSortOrder(id); setSortOpen(false); }}
+                        className="w-full flex items-center justify-between px-3.5 py-2 text-[13px] font-medium transition-colors"
+                        style={{ color: "var(--th-text-primary)", backgroundColor: sortOrder === id ? "var(--th-bg-hover)" : "transparent" }}
+                      >
+                        {label}
+                        {sortOrder === id && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--th-fax-cta-bg)" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -712,8 +751,8 @@ function Toggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {
   );
 }
 
-function RecipientInput({ chips, onAdd, onRemove }: { chips: string[]; onAdd: (v: string) => void; onRemove: (i: number) => void }) {
-  const [val, setVal] = useState("");
+function RecipientInput({ chips, onAdd, onRemove, value, onValueChange }: { chips: string[]; onAdd: (v: string) => void; onRemove: (i: number) => void; value: string; onValueChange: (v: string) => void }) {
+  const commit = () => { const t = value.trim(); if (t) { onAdd(t); onValueChange(""); } };
   return (
     <div className="flex flex-wrap items-center gap-1.5 px-2.5 py-2 rounded-xl min-h-[46px]" style={inputStyle}>
       {chips.map((c, i) => (
@@ -725,9 +764,10 @@ function RecipientInput({ chips, onAdd, onRemove }: { chips: string[]; onAdd: (v
         </span>
       ))}
       <input
-        value={val}
-        onChange={(e) => setVal(e.target.value)}
-        onKeyDown={(e) => { if ((e.key === "Enter" || e.key === ",") && val.trim()) { e.preventDefault(); onAdd(val.trim()); setVal(""); } }}
+        value={value}
+        onChange={(e) => onValueChange(e.target.value)}
+        onKeyDown={(e) => { if ((e.key === "Enter" || e.key === ",") && value.trim()) { e.preventDefault(); commit(); } }}
+        onBlur={commit}
         placeholder="Add fax number"
         className="flex-1 min-w-[120px] bg-transparent outline-none text-[14px] placeholder:text-[#9AA3AB]"
         style={{ color: "var(--th-text-primary)" }}
@@ -758,6 +798,7 @@ function CoverSheetStep({
   const [tplName, setTplName] = useState(template);
   const [attention, setAttention] = useState("Legal Team");
   const [footerName, setFooterName] = useState<string | null>(null);
+  const [recipInput, setRecipInput] = useState("");
   return (
     <div className="space-y-5">
       {/* Tabs */}
@@ -782,7 +823,7 @@ function CoverSheetStep({
             </div>
           </div>
           <div><FieldLabel hint="(personal fax number)">From</FieldLabel><Select value={from} onChange={setFrom} options={senderNumbers} /></div>
-          <div><FieldLabel required>Recipients</FieldLabel><RecipientInput chips={chips} onAdd={(v) => setChips([...chips, v])} onRemove={(i) => setChips(chips.filter((_, j) => j !== i))} /></div>
+          <div><FieldLabel required>Recipients</FieldLabel><RecipientInput chips={chips} onAdd={(v) => setChips([...chips, v])} onRemove={(i) => setChips(chips.filter((_, j) => j !== i))} value={recipInput} onValueChange={setRecipInput} /></div>
           <div><FieldLabel>Subject</FieldLabel><input value={subject} onChange={(e) => setSubject(e.target.value)} className="w-full px-4 py-2.5 rounded-xl text-[14px] outline-none" style={inputStyle} /></div>
           <div><FieldLabel hint="(Optional)">Message</FieldLabel><textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={3} className="w-full px-4 py-2.5 rounded-xl text-[14px] outline-none resize-none" style={inputStyle} /></div>
         </>
@@ -944,6 +985,7 @@ function ComposeFaxDialog({ onClose, onSent, onNotify }: { onClose: () => void; 
   const [step, setStep] = useState<1 | 2>(1);
   const [from, setFrom] = useState(senderNumbers[0]);
   const [chips, setChips] = useState<string[]>([]);
+  const [recipInput, setRecipInput] = useState("");
   const [includeCover, setIncludeCover] = useState(true);
   const [coverOnly, setCoverOnly] = useState(false);
   const [files, setFiles] = useState<{ name: string; size: string }[]>([{ name: "NDA_signed_final.pdf", size: "1.2 MB" }]);
@@ -953,8 +995,12 @@ function ComposeFaxDialog({ onClose, onSent, onNotify }: { onClose: () => void; 
   const [template, setTemplate] = useState("Cover for legal");
 
   const goNext = () => {
+    const pending = recipInput.trim();
+    const list = pending ? [...chips, pending] : chips;
+    if (pending) { setChips(list); setRecipInput(""); }
+    if (list.length === 0) return;
     if (coverOnly || includeCover) setStep(2);
-    else onSent(subject, `${chips[0] ?? "Recipient"} · ${files.length} file(s)`);
+    else onSent(subject, `${list[0] ?? "Recipient"} · ${files.length} file(s)`);
   };
 
   return (
@@ -969,7 +1015,7 @@ function ComposeFaxDialog({ onClose, onSent, onNotify }: { onClose: () => void; 
             </div>
             <div>
               <FieldLabel required>Recipients</FieldLabel>
-              <RecipientInput chips={chips} onAdd={(v) => setChips([...chips, v])} onRemove={(i) => setChips(chips.filter((_, j) => j !== i))} />
+              <RecipientInput chips={chips} onAdd={(v) => setChips([...chips, v])} onRemove={(i) => setChips(chips.filter((_, j) => j !== i))} value={recipInput} onValueChange={setRecipInput} />
             </div>
             <ToggleRow label="Include a cover sheet" on={includeCover} onToggle={() => { setIncludeCover(!includeCover); if (!includeCover) setCoverOnly(false); }} />
             <ToggleRow label="Send a cover sheet only" on={coverOnly} onToggle={() => { setCoverOnly(!coverOnly); if (!coverOnly) setIncludeCover(false); }} />
@@ -1016,7 +1062,7 @@ function ComposeFaxDialog({ onClose, onSent, onNotify }: { onClose: () => void; 
         <div className="flex items-center gap-4">
           <button onClick={step === 2 ? () => setStep(1) : onClose} className="text-[13px] font-bold uppercase tracking-wider" style={{ color: "var(--th-text-secondary)" }}>{step === 2 ? "Back" : "Cancel"}</button>
           {step === 1 ? (
-            <button onClick={goNext} disabled={chips.length === 0} className="btn-primary px-5 py-2.5 rounded-xl text-[13px] font-bold uppercase tracking-wider disabled:opacity-40 disabled:cursor-not-allowed" style={{ backgroundColor: "var(--th-fax-cta-bg)", color: "var(--th-fax-cta-text)" }}>{includeCover || coverOnly ? "Next: Cover sheet" : "Send fax"}</button>
+            <button onClick={goNext} disabled={chips.length === 0 && !recipInput.trim()} className="btn-primary px-5 py-2.5 rounded-xl text-[13px] font-bold uppercase tracking-wider disabled:opacity-40 disabled:cursor-not-allowed" style={{ backgroundColor: "var(--th-fax-cta-bg)", color: "var(--th-fax-cta-text)" }}>{includeCover || coverOnly ? "Next: Cover sheet" : "Send fax"}</button>
           ) : (
             <button onClick={() => onSent(subject, `${chips[0] ?? "Recipient"} · ${subject}`)} disabled={chips.length === 0} className="btn-primary px-6 py-2.5 rounded-xl text-[13px] font-bold uppercase tracking-wider disabled:opacity-40 disabled:cursor-not-allowed" style={{ backgroundColor: "var(--th-fax-cta-bg)", color: "var(--th-fax-cta-text)" }}>Send fax</button>
           )}
@@ -1051,6 +1097,7 @@ function ForwardFaxDialog({ fax, onClose, onForward, onNotify }: { fax: FaxItem;
   const [step, setStep] = useState<1 | 2>(1);
   const [from, setFrom] = useState(senderNumbers[0]);
   const [chips, setChips] = useState<string[]>([]);
+  const [recipInput, setRecipInput] = useState("");
   const [cover, setCover] = useState(false);
   const [message, setMessage] = useState("Please take a look at the documents the company sent us yesterday and let us know what you think. Thanks");
   const [coverTab, setCoverTab] = useState<"default" | "custom">("default");
@@ -1058,6 +1105,10 @@ function ForwardFaxDialog({ fax, onClose, onForward, onNotify }: { fax: FaxItem;
   const [template, setTemplate] = useState("Cover for legal");
 
   const goNext = () => {
+    const pending = recipInput.trim();
+    const list = pending ? [...chips, pending] : chips;
+    if (pending) { setChips(list); setRecipInput(""); }
+    if (list.length === 0) return;
     if (cover) setStep(2);
     else onForward();
   };
@@ -1069,7 +1120,7 @@ function ForwardFaxDialog({ fax, onClose, onForward, onNotify }: { fax: FaxItem;
         {step === 1 ? (
           <div className="space-y-5">
             <div><FieldLabel hint="(personal fax number)">From</FieldLabel><Select value={from} onChange={setFrom} options={senderNumbers} /></div>
-            <div><FieldLabel required>Recipients</FieldLabel><RecipientInput chips={chips} onAdd={(v) => setChips([...chips, v])} onRemove={(i) => setChips(chips.filter((_, j) => j !== i))} /></div>
+            <div><FieldLabel required>Recipients</FieldLabel><RecipientInput chips={chips} onAdd={(v) => setChips([...chips, v])} onRemove={(i) => setChips(chips.filter((_, j) => j !== i))} value={recipInput} onValueChange={setRecipInput} /></div>
             <ToggleRow label="Include a cover sheet" on={cover} onToggle={() => setCover(!cover)} />
             <div>
               <FieldLabel hint="(original fax)">Forwarding</FieldLabel>
@@ -1100,7 +1151,7 @@ function ForwardFaxDialog({ fax, onClose, onForward, onNotify }: { fax: FaxItem;
         <div className="flex items-center gap-4">
           <button onClick={step === 2 ? () => setStep(1) : onClose} className="text-[13px] font-bold uppercase tracking-wider" style={{ color: "var(--th-text-secondary)" }}>{step === 2 ? "Back" : "Cancel"}</button>
           {step === 1 ? (
-            <button onClick={goNext} disabled={chips.length === 0} className="btn-primary px-6 py-2.5 rounded-xl text-[13px] font-bold uppercase tracking-wider disabled:opacity-40 disabled:cursor-not-allowed" style={{ backgroundColor: "var(--th-fax-cta-bg)", color: "var(--th-fax-cta-text)" }}>{cover ? "Next: Cover sheet" : "Forward"}</button>
+            <button onClick={goNext} disabled={chips.length === 0 && !recipInput.trim()} className="btn-primary px-6 py-2.5 rounded-xl text-[13px] font-bold uppercase tracking-wider disabled:opacity-40 disabled:cursor-not-allowed" style={{ backgroundColor: "var(--th-fax-cta-bg)", color: "var(--th-fax-cta-text)" }}>{cover ? "Next: Cover sheet" : "Forward"}</button>
           ) : (
             <button onClick={onForward} className="btn-primary px-6 py-2.5 rounded-xl text-[13px] font-bold uppercase tracking-wider" style={{ backgroundColor: "var(--th-fax-cta-bg)", color: "var(--th-fax-cta-text)" }}>Forward</button>
           )}
