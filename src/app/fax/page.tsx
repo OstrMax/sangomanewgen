@@ -200,11 +200,20 @@ export default function FaxPage() {
               <button
                 onClick={() => setCompose({ mode: "new" })}
                 data-fax-tour="new-fax"
-                className="btn-cta flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-[12px] font-bold uppercase tracking-wider"
-                style={{ backgroundColor: "var(--th-fax-cta-bg)", color: "var(--th-fax-cta-text)" }}
+                className="btn-icon flex items-center justify-center w-9 h-9 rounded-full"
+                style={{ border: "1px solid var(--th-border)" }}
+                data-tip="New fax"
+                data-tip-pos="bottom"
               >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-                New fax
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path d="M13 8H8V13C8 13.55 7.55 14 7 14C6.45 14 6 13.55 6 13V8H1C0.45 8 0 7.55 0 7C0 6.45 0.45 6 1 6H6V1C6 0.45 6.45 0 7 0C7.55 0 8 0.45 8 1V6H13C13.55 6 14 6.45 14 7C14 7.55 13.55 8 13 8Z" fill="url(#faxPlusGrad)" />
+                  <defs>
+                    <linearGradient id="faxPlusGrad" x1="7" y1="0" x2="7" y2="14" gradientUnits="userSpaceOnUse">
+                      <stop stopColor="#B30B84" />
+                      <stop offset="1" stopColor="#46126F" />
+                    </linearGradient>
+                  </defs>
+                </svg>
               </button>
             </div>
           </div>
@@ -331,7 +340,6 @@ export default function FaxPage() {
               <FaxRow
                 key={fax.id}
                 fax={fax}
-                selected={selectedId === fax.id}
                 unread={!!fax.unread && !readIds.has(fax.id)}
                 checked={checkedIds.has(fax.id)}
                 onSelect={() => { setSelectedId(fax.id); setReadIds((prev) => prev.has(fax.id) ? prev : new Set(prev).add(fax.id)); }}
@@ -528,14 +536,14 @@ export default function FaxPage() {
 /* ────────────────────────────────────────────────────────────
    Sub-components
 ──────────────────────────────────────────────────────────── */
-function FaxRow({ fax, selected, unread, checked, onSelect, onCheck }: { fax: FaxItem; selected: boolean; unread: boolean; checked: boolean; onSelect: () => void; onCheck: () => void }) {
+function FaxRow({ fax, unread, checked, onSelect, onCheck }: { fax: FaxItem; unread: boolean; checked: boolean; onSelect: () => void; onCheck: () => void }) {
   return (
     <div
       onClick={onSelect}
       className="w-full text-left px-4 py-3 flex gap-3 cursor-pointer group transition-colors"
-      style={{ backgroundColor: selected ? "var(--th-active-conv-bg)" : unread ? "var(--th-unread-bg)" : "transparent", borderBottom: "1px solid var(--th-border-light)" }}
-      onMouseEnter={(e) => { if (!selected) e.currentTarget.style.backgroundColor = "var(--th-bg-hover)"; }}
-      onMouseLeave={(e) => { if (!selected) e.currentTarget.style.backgroundColor = unread ? "var(--th-unread-bg)" : "transparent"; }}
+      style={{ backgroundColor: unread ? "var(--th-unread-bg)" : "transparent", borderBottom: "1px solid var(--th-border-light)" }}
+      onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "var(--th-bg-hover)"; }}
+      onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = unread ? "var(--th-unread-bg)" : "transparent"; }}
     >
       {/* Checkbox */}
       <button

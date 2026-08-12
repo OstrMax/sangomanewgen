@@ -38,8 +38,8 @@
   --th-icon-hover-fg: #142B53;
   --th-tooltip-bg: #001221;
   /* Fax panel resting states (Figma node 8396-222410) */
-  --th-search-field-bg: #E8EDF5;
-  --th-search-field-border: #E5E6E8;
+  --th-search-field-bg: #F2F2F3;
+  --th-search-field-border: transparent;
   --th-search-field-focus: #001221;
   --th-checkbox-border: #99A0A6;
   --th-bg-input: #ffffff;
@@ -111,8 +111,8 @@
   --th-icon-active-bg: rgba(255,255,255,0.14);
   --th-icon-hover-fg: #E8EDF5;
   --th-tooltip-bg: #0B182E;
-  --th-search-field-bg: #0B182E;
-  --th-search-field-border: #112547;
+  --th-search-field-bg: #14243D;
+  --th-search-field-border: transparent;
   --th-search-field-focus: #ffffff;
   --th-checkbox-border: #4C5863;
   --th-bg-input: #001221;
