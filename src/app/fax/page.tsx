@@ -30,7 +30,7 @@ interface Folder {
   id: string;
   name: string;
   count: number;
-  kind: "custom" | "drafts" | "trash";
+  kind: "custom" | "trash";
 }
 
 const faxes: FaxItem[] = [
@@ -53,7 +53,6 @@ const initialFolders: Folder[] = [
   { id: "legal", name: "Legal", count: 5, kind: "custom" },
   { id: "tax2026", name: "Tax 2026", count: 3, kind: "custom" },
   { id: "insurance", name: "Insurance", count: 8, kind: "custom" },
-  { id: "drafts", name: "Drafts", count: 0, kind: "drafts" },
   { id: "trash", name: "Trash", count: 3, kind: "trash" },
 ];
 
@@ -68,9 +67,6 @@ export default function FaxPage() {
   const [readIds, setReadIds] = useState<Set<number>>(new Set([1]));
   const [checkedIds, setCheckedIds] = useState<Set<number>>(new Set());
   const [search, setSearch] = useState("");
-  const [sortOpen, setSortOpen] = useState(false);
-  const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
-  const [showFilter, setShowFilter] = useState<"all" | "unread">("all");
   const [showMoreFolders, setShowMoreFolders] = useState(false);
   const [folders, setFolders] = useState<Folder[]>(initialFolders);
 
@@ -106,18 +102,14 @@ export default function FaxPage() {
   const visibleFaxes = useMemo(() => {
     let list: FaxItem[];
     if (isSystem) list = faxes.filter((f) => f.box === view);
-    else if (view === "drafts") list = [];
     else list = faxes.filter((f) => f.folderId === view);
-    let out = list.filter(
+    return list.filter(
       (f) =>
         f.contact.toLowerCase().includes(search.toLowerCase()) ||
         f.number.toLowerCase().includes(search.toLowerCase()) ||
         f.subject.toLowerCase().includes(search.toLowerCase())
     );
-    if (showFilter === "unread") out = out.filter((f) => f.unread && !readIds.has(f.id));
-    if (sortOrder === "oldest") out = [...out].reverse();
-    return out;
-  }, [view, isSystem, search, showFilter, sortOrder, readIds]);
+  }, [view, isSystem, search]);
 
   const selected = faxes.find((f) => f.id === selectedId) || null;
   const unreadCount = faxes.filter((f) => f.box === "inbox" && f.unread && !readIds.has(f.id)).length;
@@ -162,7 +154,10 @@ export default function FaxPage() {
     fireToast("Folder deleted", `“${f.name}” was removed`);
   };
 
-  const visibleFolders = showMoreFolders ? folders : folders.slice(0, 5);
+  const customFolders = folders.filter((f) => f.kind === "custom");
+  const trashFolder = folders.find((f) => f.kind === "trash");
+  const visibleCustom = showMoreFolders ? customFolders : customFolders.slice(0, 4);
+  const visibleFolders = trashFolder ? [...visibleCustom, trashFolder] : visibleCustom;
 
   const headerTitle = isSystem ? "Fax" : activeFolder?.name ?? "Fax";
 
@@ -210,9 +205,9 @@ export default function FaxPage() {
             </div>
           </div>
 
-          {/* Search + filter */}
-          <div className="flex items-center gap-2" data-fax-tour="search">
-            <div className="flex items-center gap-2 px-3 py-2 rounded-lg flex-1" style={{ backgroundColor: "var(--th-bg-hover)" }}>
+          {/* Search */}
+          <div className="flex items-center" data-fax-tour="search">
+            <div className="flex items-center gap-2 px-3 h-9 rounded-lg flex-1" style={{ backgroundColor: "var(--th-bg-hover)" }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7F888F" strokeWidth="2"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
               <input
                 type="text"
@@ -222,43 +217,16 @@ export default function FaxPage() {
                 className="bg-transparent outline-none text-sm placeholder:text-[#7F888F] w-full"
                 style={{ color: "var(--th-text-primary)" }}
               />
-            </div>
-            {/* Sort & filter */}
-            <div className="relative shrink-0">
+              {/* Advanced search — inside the search field */}
               <button
-                onClick={() => setSortOpen((v) => !v)}
-                className="btn-icon flex items-center justify-center w-9 h-9 rounded-lg"
-                style={{ backgroundColor: sortOpen || showFilter === "unread" || sortOrder === "oldest" ? "var(--th-active-conv-bg)" : "var(--th-bg-hover)" }}
-                data-tip="Sort & filter"
+                onClick={() => setShowSearch(true)}
+                className="btn-icon flex items-center justify-center w-5 h-5 shrink-0 -mr-0.5"
+                data-tip="Advanced search"
                 data-tip-pos="bottom"
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--th-text-secondary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" /></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--th-text-secondary)" strokeWidth="2" strokeLinecap="round"><line x1="4" y1="21" x2="4" y2="14" /><line x1="4" y1="10" x2="4" y2="3" /><line x1="12" y1="21" x2="12" y2="12" /><line x1="12" y1="8" x2="12" y2="3" /><line x1="20" y1="21" x2="20" y2="16" /><line x1="20" y1="12" x2="20" y2="3" /><line x1="1" y1="14" x2="7" y2="14" /><line x1="9" y1="8" x2="15" y2="8" /><line x1="17" y1="16" x2="23" y2="16" /></svg>
               </button>
-              {sortOpen && (
-                <>
-                  <div className="fixed inset-0 z-40" onClick={() => setSortOpen(false)} />
-                  <div className="absolute top-11 right-0 z-50 w-52 rounded-xl py-1.5 modal-enter" style={{ backgroundColor: "var(--th-bg-card)", boxShadow: "0 8px 24px rgba(0,0,0,0.16)", border: "1px solid var(--th-border)" }}>
-                    <div className="px-3.5 py-1 text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--th-text-muted)" }}>Sort by</div>
-                    <FilterItem label="Newest first" active={sortOrder === "newest"} onClick={() => { setSortOrder("newest"); setSortOpen(false); }} />
-                    <FilterItem label="Oldest first" active={sortOrder === "oldest"} onClick={() => { setSortOrder("oldest"); setSortOpen(false); }} />
-                    <div className="my-1 h-px" style={{ backgroundColor: "var(--th-border)" }} />
-                    <div className="px-3.5 py-1 text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--th-text-muted)" }}>Show</div>
-                    <FilterItem label="Show all" active={showFilter === "all"} onClick={() => { setShowFilter("all"); setSortOpen(false); }} />
-                    <FilterItem label="Show unread only" active={showFilter === "unread"} onClick={() => { setShowFilter("unread"); setSortOpen(false); }} />
-                  </div>
-                </>
-              )}
             </div>
-            {/* Advanced search */}
-            <button
-              onClick={() => setShowSearch(true)}
-              className="btn-icon flex items-center justify-center w-9 h-9 rounded-lg shrink-0"
-              style={{ backgroundColor: "var(--th-bg-hover)" }}
-              data-tip="Advanced search"
-              data-tip-pos="bottom"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--th-text-secondary)" strokeWidth="2" strokeLinecap="round"><line x1="4" y1="21" x2="4" y2="14" /><line x1="4" y1="10" x2="4" y2="3" /><line x1="12" y1="21" x2="12" y2="12" /><line x1="12" y1="8" x2="12" y2="3" /><line x1="20" y1="21" x2="20" y2="16" /><line x1="20" y1="12" x2="20" y2="3" /><line x1="1" y1="14" x2="7" y2="14" /><line x1="9" y1="8" x2="15" y2="8" /><line x1="17" y1="16" x2="23" y2="16" /></svg>
-            </button>
           </div>
         </div>
 
@@ -290,12 +258,12 @@ export default function FaxPage() {
           </div>
         )}
 
-        {/* Count label */}
-        <div className="flex items-center justify-between px-5 pb-2">
-          <span className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: "var(--th-text-muted)" }}>{visibleFaxes.length} {visibleFaxes.length === 1 ? "fax" : "faxes"}</span>
-          {visibleFaxes.length > 0 && (() => {
-            const allChecked = visibleFaxes.every((f) => checkedIds.has(f.id));
-            return (
+        {/* Select all */}
+        {visibleFaxes.length > 0 && (() => {
+          const allChecked = visibleFaxes.every((f) => checkedIds.has(f.id));
+          const selectedCount = visibleFaxes.filter((f) => checkedIds.has(f.id)).length;
+          return (
+            <div className="px-4 pb-2 pt-1">
               <button
                 onClick={() => setCheckedIds((prev) => {
                   const next = new Set(prev);
@@ -303,19 +271,26 @@ export default function FaxPage() {
                   else visibleFaxes.forEach((f) => next.add(f.id));
                   return next;
                 })}
-                className="text-[11px] font-semibold uppercase tracking-wider transition-colors"
-                style={{ color: "var(--th-text-secondary)" }}
+                className="flex items-center gap-2.5 group"
               >
-                {allChecked ? "Deselect all" : "Select all"}
+                <span
+                  className="w-[18px] h-[18px] shrink-0 rounded-[5px] flex items-center justify-center transition-colors"
+                  style={{ border: allChecked ? "none" : "1.5px solid var(--th-border)", backgroundColor: allChecked ? "var(--th-fax-cta-bg)" : "transparent" }}
+                >
+                  {allChecked && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--th-fax-cta-text)" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>}
+                </span>
+                <span className="text-[11px] font-semibold uppercase tracking-[0.4px] transition-colors group-hover:opacity-80" style={{ color: "var(--th-text-muted)" }}>
+                  Select all ({selectedCount})
+                </span>
               </button>
-            );
-          })()}
-        </div>
+            </div>
+          );
+        })()}
 
         {/* Fax list */}
         <div className="flex-1 overflow-y-auto" data-fax-tour="list">
           {visibleFaxes.length === 0 ? (
-            <EmptyList label={view === "drafts" ? "No drafts" : `No ${isSystem ? view : "faxes"}`} sub={view === "drafts" ? "Drafts you save will appear here" : "Faxes will appear here"} />
+            <EmptyList label={`No ${isSystem ? view : "faxes"}`} sub="Faxes will appear here" />
           ) : (
             visibleFaxes.map((fax) => (
               <FaxRow
@@ -382,7 +357,7 @@ export default function FaxPage() {
               );
             })}
           </div>
-          {folders.length > 5 && (
+          {customFolders.length > 4 && (
             <button onClick={() => setShowMoreFolders(!showMoreFolders)} className="w-full text-center text-[11px] font-bold uppercase tracking-wider mt-3 transition-colors" style={{ color: "var(--th-tab-active)" }}>
               {showMoreFolders ? "Show fewer folders" : "Show more folders"}
             </button>
@@ -573,8 +548,6 @@ function StatusBadge({ status }: { status: FaxStatus }) {
 
 function FolderIcon({ kind }: { kind: Folder["kind"] }) {
   const stroke = "var(--th-text-secondary)";
-  if (kind === "drafts")
-    return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="1.6"><path d="M12 20h9" /><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4L16.5 3.5z" /></svg>;
   if (kind === "trash")
     return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="1.6"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" /></svg>;
   return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="1.6"><path d="M3 7h6l2 2h10v10a1 1 0 01-1 1H3a1 1 0 01-1-1V7a1 1 0 011-1z" /></svg>;
@@ -601,15 +574,6 @@ function MenuItem({ label, onClick, danger }: { label: string; onClick: () => vo
   return (
     <button onClick={onClick} className="w-full text-left px-3.5 py-2 text-[13px] font-medium transition-colors" style={{ color: danger ? "#EF4444" : "var(--th-text-primary)" }} onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "var(--th-bg-hover)")} onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}>
       {label}
-    </button>
-  );
-}
-
-function FilterItem({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
-  return (
-    <button onClick={onClick} className="w-full flex items-center justify-between px-3.5 py-2 text-[13px] font-medium transition-colors" style={{ color: "var(--th-text-primary)" }} onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "var(--th-bg-hover)")} onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}>
-      {label}
-      {active && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--th-tab-active)" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>}
     </button>
   );
 }

@@ -125,7 +125,7 @@ export default function Sidebar() {
             )}
             {item.unread && (
               <span
-                className="absolute top-[6px] right-[10px] w-2.5 h-2.5 bg-[#ff4d6d] rounded-full z-20"
+                className="absolute top-[6px] right-[10px] w-2.5 h-2.5 bg-[#fcc624] rounded-full z-20"
                 style={{ border: "2px solid var(--th-sidebar-badge-border)" }}
               />
             )}
