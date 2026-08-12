@@ -1082,7 +1082,6 @@ function ForwardFaxDialog({ fax, onClose, onForward, onNotify }: { fax: FaxItem;
                 <span className="px-2.5 py-1 rounded-md text-[11px] font-bold shrink-0" style={{ backgroundColor: "rgba(122,90,248,0.12)", color: "#7A5AF8" }}>{fax.pages} pages</span>
               </div>
             </div>
-            <div><FieldLabel hint="(Optional)">Message</FieldLabel><textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={3} className="w-full px-4 py-2.5 rounded-xl text-[14px] outline-none resize-none" style={inputStyle} /></div>
           </div>
         ) : (
           <CoverSheetStep
