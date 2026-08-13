@@ -74,6 +74,7 @@ export default function FaxPage() {
 
   // dialogs / overlays
   const [compose, setCompose] = useState<null | { mode: "new" }>(null);
+  const [composeVersion, setComposeVersion] = useState<1 | 2>(2);
   const [forwardFax, setForwardFax] = useState<FaxItem | null>(null);
   const [showNewFolder, setShowNewFolder] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
@@ -240,22 +241,25 @@ export default function FaxPage() {
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--th-text-secondary)" strokeWidth="2" strokeLinecap="round"><line x1="4" y1="21" x2="4" y2="14" /><line x1="4" y1="10" x2="4" y2="3" /><line x1="12" y1="21" x2="12" y2="12" /><line x1="12" y1="8" x2="12" y2="3" /><line x1="20" y1="21" x2="20" y2="16" /><line x1="20" y1="12" x2="20" y2="3" /><line x1="1" y1="14" x2="7" y2="14" /><line x1="9" y1="8" x2="15" y2="8" /><line x1="17" y1="16" x2="23" y2="16" /></svg>
               </button>
             </div>
-            {/* Sort by */}
+            {/* Filter by */}
             <div className="relative shrink-0">
               <button
                 onClick={() => setSortOpen((v) => !v)}
-                className="btn-icon flex items-center justify-center w-9 h-9 rounded-lg"
+                className="btn-icon flex items-center justify-center w-9 h-9 rounded-lg relative"
                 style={{ backgroundColor: sortOpen || faxFilter !== "all" ? "var(--th-icon-active-bg)" : "var(--th-bg-hover)" }}
-                data-tip="Sort by"
+                data-tip="Filter by"
                 data-tip-pos="bottom"
               >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--th-text-secondary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="6" x2="20" y2="6" /><line x1="6" y1="12" x2="18" y2="12" /><line x1="9" y1="18" x2="15" y2="18" /></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--th-text-secondary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" /></svg>
+                {faxFilter !== "all" && (
+                  <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full" style={{ backgroundColor: "var(--th-fax-cta-bg)", border: "2px solid var(--th-bg)" }} />
+                )}
               </button>
               {sortOpen && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setSortOpen(false)} />
                   <div className="absolute right-0 mt-1.5 w-44 rounded-xl overflow-hidden z-50 py-1" style={{ backgroundColor: "var(--th-dropdown-bg)", border: "1px solid var(--th-dropdown-border)", boxShadow: "var(--th-dropdown-shadow)" }}>
-                    <div className="px-3.5 pt-1.5 pb-1 text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--th-text-muted)" }}>Sort by</div>
+                    <div className="px-3.5 pt-1.5 pb-1 text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--th-text-muted)" }}>Filter by</div>
                     {([["all", "All faxes"], ["unread", "Unread only"]] as const).map(([id, label]) => (
                       <button
                         key={id}
@@ -299,6 +303,18 @@ export default function FaxPage() {
                 </button>
               );
             })}
+          </div>
+        )}
+
+        {/* Active filter chip */}
+        {faxFilter !== "all" && (
+          <div className="px-4 pt-1 pb-1">
+            <span className="inline-flex items-center gap-1.5 pl-2.5 pr-1.5 py-1 rounded-full text-[11px] font-semibold" style={{ backgroundColor: "var(--th-icon-active-bg)", color: "var(--th-text-primary)" }}>
+              Unread only
+              <button onClick={() => setFaxFilter("all")} className="flex items-center justify-center w-4 h-4 rounded-full transition-colors hover:opacity-70" data-tip="Clear filter">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+              </button>
+            </span>
           </div>
         )}
 
@@ -490,7 +506,8 @@ export default function FaxPage() {
       )}
 
       {/* ───────── Dialogs / overlays ───────── */}
-      {compose && <ComposeFaxDialog onClose={() => setCompose(null)} onSent={(sub, sub2) => { setCompose(null); fireToast("Fax sent", sub2); }} onNotify={fireToast} />}
+      {compose && composeVersion === 1 && <ComposeFaxDialog onClose={() => setCompose(null)} onSent={(sub, sub2) => { setCompose(null); fireToast("Fax sent", sub2); }} onNotify={fireToast} />}
+      {compose && composeVersion === 2 && <ComposeFaxDialogV2 onClose={() => setCompose(null)} onSent={(sub, sub2) => { setCompose(null); fireToast("Fax sent", sub2); }} />}
       {forwardFax && <ForwardFaxDialog fax={forwardFax} onClose={() => setForwardFax(null)} onForward={() => { setForwardFax(null); fireToast("Fax forwarded", forwardFax.subject); }} onNotify={fireToast} />}
       {showNewFolder && <NewFolderDialog onClose={() => setShowNewFolder(false)} onCreate={createFolder} />}
       {renameFolder && <RenameFolderDialog folder={renameFolder} onClose={() => setRenameFolder(null)} onRename={(name) => doRenameFolder(renameFolder.id, name)} />}
@@ -529,6 +546,28 @@ export default function FaxPage() {
 
       {/* Contextual tutorial */}
       <FaxWalkthrough active={tourActive} onClose={() => setTourActive(false)} />
+
+      {/* A/B version switch — floats OUTSIDE the app chrome for user testing */}
+      <div
+        className="fixed bottom-5 right-5 z-[1100] flex items-center gap-1.5 pl-3 pr-1.5 py-1.5 rounded-full shadow-2xl"
+        style={{ backgroundColor: "#17171c", border: "1px solid rgba(255,255,255,0.14)" }}
+      >
+        <span className="text-[10px] font-bold uppercase tracking-[0.6px] text-white/45 mr-1">New fax</span>
+        {([[1, "A", "Inline"], [2, "B", "2-step"]] as const).map(([v, letter, label]) => (
+          <button
+            key={v}
+            onClick={() => setComposeVersion(v)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold transition-all active:scale-95"
+            style={{
+              backgroundColor: composeVersion === v ? "#ffffff" : "transparent",
+              color: composeVersion === v ? "#17171c" : "rgba(255,255,255,0.6)",
+            }}
+          >
+            <span className="font-extrabold">{letter}</span>
+            <span className="text-[11px] font-medium opacity-90">{label}</span>
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
@@ -716,7 +755,7 @@ function Toast({ title, sub, kind = "success", onClose }: { title: string; sub: 
 ──────────────────────────────────────────────────────────── */
 function DialogShell({ children, onClose, width = 540 }: { children: React.ReactNode; onClose: () => void; width?: number }) {
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4" style={{ backgroundColor: "rgba(0,0,0,0.4)" }} onClick={onClose}>
+    <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4" style={{ backgroundColor: "rgba(0,0,0,0.4)" }} onClick={onClose}>
       <div className="modal-enter rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]" style={{ backgroundColor: "var(--th-bg-card)", width }} onClick={(e) => e.stopPropagation()}>
         {children}
       </div>
@@ -898,7 +937,7 @@ function CoverSheetPreview({ from, to, subject, message, onBack, onUse }: {
 }) {
   const today = new Date().toLocaleDateString("en-US", { year: "numeric", month: "2-digit", day: "2-digit" });
   return (
-    <div className="fixed inset-0 z-[210] flex items-center justify-center p-4" style={{ backgroundColor: "rgba(0,0,0,0.4)" }} onClick={onBack}>
+    <div className="fixed inset-0 z-[1010] flex items-center justify-center p-4" style={{ backgroundColor: "rgba(0,0,0,0.4)" }} onClick={onBack}>
       <div className="modal-enter rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]" style={{ backgroundColor: "var(--th-bg-card)", width: 520 }} onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between px-6 py-4 shrink-0">
           <h2 className="text-lg font-bold" style={{ color: "var(--th-text-primary)" }}>Cover sheet preview</h2>
@@ -1054,6 +1093,181 @@ function ComposeFaxDialog({ onClose, onSent, onNotify }: { onClose: () => void; 
         <button onClick={onClose} className="text-[13px] font-bold uppercase tracking-wider" style={{ color: "var(--th-text-secondary)" }}>Cancel</button>
         <button onClick={send} disabled={!canSend} className="btn-primary px-6 py-2.5 rounded-xl text-[13px] font-bold uppercase tracking-wider disabled:opacity-40 disabled:cursor-not-allowed" style={{ backgroundColor: "var(--th-fax-cta-bg)", color: "var(--th-fax-cta-text)" }}>Send fax</button>
       </div>
+    </DialogShell>
+  );
+}
+
+/* ── Compose V2 — 2-step Figma flow (node 8338-85822) ──
+   Step 1 "Recipients & attachment": from, recipients, two cover-sheet
+   toggles, then attachments.  Step 2 "Cover sheet": Default cover /
+   Custom template.  No stepper — matches Figma 1:1.                        */
+function ComposeFaxDialogV2({ onClose, onSent }: { onClose: () => void; onSent: (a: string, b: string) => void }) {
+  const [step, setStep] = useState<1 | 2>(1);
+  const [from, setFrom] = useState(senderNumbers[0]);
+  const [chips, setChips] = useState<string[]>([]);
+  const [recipInput, setRecipInput] = useState("");
+  const [includeCover, setIncludeCover] = useState(false);
+  const [coverOnly, setCoverOnly] = useState(false);
+  const [files, setFiles] = useState<{ name: string; size: string }[]>([]);
+  const [coverTab, setCoverTab] = useState<"default" | "custom">("default");
+  const [subject, setSubject] = useState("Signed NDA — Q2 kickoff");
+  const [message, setMessage] = useState("Please find the signed NDA attached. Reach out with any questions before Friday's kickoff.");
+  const [template, setTemplate] = useState("Cover for legal");
+  const [showPreview, setShowPreview] = useState(false);
+
+  const includeOn = includeCover || coverOnly;
+  const hasRecipient = chips.length > 0 || recipInput.trim().length > 0;
+  const canProceed = hasRecipient && (includeOn || files.length > 0);
+  const to = chips[0] || recipInput.trim() || "—";
+
+  const commitRecipients = () => {
+    const pending = recipInput.trim();
+    const list = pending ? [...chips, pending] : chips;
+    if (pending) { setChips(list); setRecipInput(""); }
+    return list;
+  };
+  const send = () => {
+    const list = commitRecipients();
+    if (list.length === 0) return;
+    onSent(subject, includeOn ? `${list[0] ?? "Recipient"} · ${subject}` : `${list[0] ?? "Recipient"} · ${files.length} file(s)`);
+  };
+  const goNext = () => {
+    const list = commitRecipients();
+    if (list.length === 0) return;
+    if (includeOn) setStep(2);
+    else send();
+  };
+
+  return (
+    <DialogShell onClose={onClose} width={560}>
+      <DialogHeader
+        title={step === 1 ? "New fax. Recipients & attachment" : "New fax. Cover sheet"}
+        onClose={onClose}
+      />
+
+      <div className="px-6 py-5 overflow-y-auto flex-1">
+        {step === 1 ? (
+          <div className="space-y-5">
+            <div>
+              <FieldLabel hint="(personal fax number)">From</FieldLabel>
+              <Select value={from} onChange={setFrom} options={senderNumbers} />
+            </div>
+            <div>
+              <FieldLabel required>Recipients</FieldLabel>
+              <RecipientInput chips={chips} onAdd={(v) => setChips([...chips, v])} onRemove={(i) => setChips(chips.filter((_, j) => j !== i))} value={recipInput} onValueChange={setRecipInput} />
+            </div>
+
+            {/* Two toggles, divider-separated (Figma) */}
+            <div className="border-b" style={{ borderColor: "var(--th-border)" }}>
+              <div className="flex items-center justify-between py-3.5 border-t" style={{ borderColor: "var(--th-border)" }}>
+                <span className="text-[14px] font-medium" style={{ color: "var(--th-text-primary)" }}>Include a cover sheet</span>
+                <Toggle on={includeCover} onToggle={() => setIncludeCover((v) => !v)} />
+              </div>
+              <div className="flex items-center justify-between py-3.5 border-t" style={{ borderColor: "var(--th-border)" }}>
+                <span className="text-[14px] font-medium" style={{ color: "var(--th-text-primary)" }}>Send a cover sheet only</span>
+                <Toggle on={coverOnly} onToggle={() => setCoverOnly((v) => !v)} />
+              </div>
+            </div>
+
+            {!coverOnly && (
+              <div>
+                <FieldLabel hint="· PDF, JPG, PNG, TIFF · max 20 MB">Attachments</FieldLabel>
+                {files.length === 0 ? (
+                  <button onClick={() => setFiles([{ name: "NDA_signed_final.pdf", size: "1.2 MB" }])} className="w-full py-7 rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-1.5 transition-colors" style={{ borderColor: "var(--th-border)", backgroundColor: "var(--th-bg)" }}>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--th-text-muted)" strokeWidth="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
+                    <div className="text-[13px] font-semibold" style={{ color: "var(--th-text-primary)" }}>Click to upload or drag files</div>
+                    <div className="text-[11px]" style={{ color: "var(--th-text-muted)" }}>Multiple files supported</div>
+                  </button>
+                ) : (
+                  <div className="space-y-1.5">
+                    {files.map((f, i) => (
+                      <div key={i} className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-[12px]" style={{ backgroundColor: "var(--th-bg-hover)" }}>
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--th-text-muted)" strokeWidth="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
+                        <span className="flex-1 truncate font-medium" style={{ color: "var(--th-text-primary)" }}>{f.name}</span>
+                        <span style={{ color: "var(--th-text-muted)" }}>{f.size}</span>
+                        <button onClick={() => setFiles(files.filter((_, j) => j !== i))} className="text-[#EF4444]" data-tip="Remove file">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-5">
+            {/* Tabs */}
+            <div className="flex items-center gap-6 border-b -mt-1" style={{ borderColor: "var(--th-border)" }}>
+              {([["default", "Default cover"], ["custom", "Custom template"]] as const).map(([id, label]) => (
+                <button key={id} onClick={() => setCoverTab(id)} className="pb-2.5 text-[14px] font-semibold transition-colors relative" style={{ color: coverTab === id ? "var(--th-text-primary)" : "var(--th-text-muted)" }}>
+                  {label}
+                  {coverTab === id && <div className="absolute bottom-0 left-0 right-0 h-[2px]" style={{ backgroundColor: "#142B53" }} />}
+                </button>
+              ))}
+            </div>
+
+            {coverTab === "default" ? (
+              <>
+                {/* Sangoma banner */}
+                <div className="flex items-start gap-3 p-3.5 rounded-xl" style={{ backgroundColor: "rgba(130,86,208,0.08)" }}>
+                  <div className="flex items-center justify-center w-9 h-9 rounded-lg shrink-0" style={{ background: "linear-gradient(135deg,#8B5CF6,#6D28D9)" }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
+                  </div>
+                  <div>
+                    <p className="text-[13px] font-bold" style={{ color: "var(--th-text-primary)" }}>Sangoma standard cover page</p>
+                    <p className="text-[12px] leading-relaxed mt-0.5" style={{ color: "var(--th-text-muted)" }}>A clean built-in cover sheet is generated automatically — no header or footer image needed.</p>
+                  </div>
+                </div>
+                <div>
+                  <FieldLabel hint="(personal fax number)">From</FieldLabel>
+                  <Select value={from} onChange={setFrom} options={senderNumbers} />
+                </div>
+                <div>
+                  <FieldLabel required>Recipients</FieldLabel>
+                  <RecipientInput chips={chips} onAdd={(v) => setChips([...chips, v])} onRemove={(i) => setChips(chips.filter((_, j) => j !== i))} value={recipInput} onValueChange={setRecipInput} />
+                </div>
+                <div>
+                  <FieldLabel>Subject</FieldLabel>
+                  <input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Subject of this fax" className="w-full px-4 py-2.5 rounded-xl text-[14px] outline-none placeholder:text-[#9AA3AB]" style={inputStyle} />
+                </div>
+                <div>
+                  <FieldLabel hint="(Optional)">Message</FieldLabel>
+                  <textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={3} placeholder="Write a short message for the cover sheet…" className="w-full px-4 py-2.5 rounded-xl text-[14px] outline-none resize-none placeholder:text-[#9AA3AB]" style={inputStyle} />
+                </div>
+              </>
+            ) : (
+              <>
+                <div>
+                  <FieldLabel hint="(choose one)">Template</FieldLabel>
+                  <Select value={template} onChange={setTemplate} options={["Cover for legal", "Cover for medical"]} />
+                </div>
+                <button onClick={() => setShowPreview(true)} className="w-full py-3 rounded-xl flex items-center justify-center gap-2 text-[13px] font-semibold transition-colors hover:opacity-90" style={{ backgroundColor: "var(--th-bg-hover)", color: "var(--th-text-primary)" }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
+                  Preview cover sheet
+                </button>
+              </>
+            )}
+          </div>
+        )}
+      </div>
+
+      <div className="flex items-center justify-end gap-4 px-6 py-4 border-t shrink-0" style={{ borderColor: "var(--th-border)" }}>
+        {step === 1 ? (
+          <button onClick={onClose} className="text-[13px] font-bold uppercase tracking-wider" style={{ color: "var(--th-text-secondary)" }}>Cancel</button>
+        ) : (
+          <button onClick={() => setStep(1)} className="text-[13px] font-bold uppercase tracking-wider" style={{ color: "var(--th-text-secondary)" }}>Back</button>
+        )}
+        {step === 1 ? (
+          <button onClick={goNext} disabled={!canProceed} className="btn-primary px-6 py-2.5 rounded-xl text-[13px] font-bold uppercase tracking-wider disabled:opacity-40 disabled:cursor-not-allowed" style={{ backgroundColor: "var(--th-fax-cta-bg)", color: "var(--th-fax-cta-text)" }}>{includeOn ? "Next: cover sheet" : "Send fax"}</button>
+        ) : (
+          <button onClick={send} className="btn-primary px-6 py-2.5 rounded-xl text-[13px] font-bold uppercase tracking-wider" style={{ backgroundColor: "var(--th-fax-cta-bg)", color: "var(--th-fax-cta-text)" }}>Send fax</button>
+        )}
+      </div>
+
+      {showPreview && (
+        <CoverSheetPreview from={from} to={to} subject={subject} message={message} onBack={() => setShowPreview(false)} onUse={() => setShowPreview(false)} />
+      )}
     </DialogShell>
   );
 }
