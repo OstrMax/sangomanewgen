@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
+import { asset } from "@/lib/asset";
 
 /* ── End call icon (from provided SVG) ── */
 const EndCallIcon = ({ size = 20 }: { size?: number }) => (
@@ -258,7 +259,7 @@ function MeetingView({ title, onEnd, onMinimize }: { title: string; onEnd: () =>
         <div className="absolute top-0 left-0 right-0 z-20 flex items-center px-[24px] pt-[24px]">
           {/* Sangoma logo */}
           <div className="shrink-0 mr-4">
-            <Image src="/icons/sangoma-logo.png" alt="Sangoma" width={43} height={29} className="opacity-90" />
+            <Image src={asset("/icons/sangoma-logo.png")} alt="Sangoma" width={43} height={29} className="opacity-90" />
           </div>
 
           {/* Meeting ID / Title pill + HD — centered */}

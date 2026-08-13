@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
+import { asset } from "@/lib/asset";
 
 export type NavItem = {
   icon: string;
@@ -80,7 +81,7 @@ export default function Sidebar() {
     <div className="flex flex-col items-center gap-1 w-16 h-full pb-2 shrink-0">
       {/* Logo */}
       <Link href="/" className="flex items-center justify-center w-full h-12 pt-4 pb-3.5 overflow-hidden">
-        <Image src="/icons/logo.png" alt="TeamHub" width={36} height={24} priority />
+        <Image src={asset("/icons/logo.png")} alt="TeamHub" width={36} height={24} priority />
       </Link>
 
       {navItems.map((item) => {
@@ -98,7 +99,7 @@ export default function Sidebar() {
             style={isActive ? { backgroundColor: "var(--th-sidebar-active)" } : undefined}
           >
             <Image
-              src={item.icon}
+              src={asset(item.icon)}
               alt={item.label}
               width={item.iconSize}
               height={item.iconSize}

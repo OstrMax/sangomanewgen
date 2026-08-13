@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useWhiteLabel, DEFAULT_WHITE_LABEL, type SidebarStyle } from "@/contexts/WhiteLabelContext";
+import { asset } from "@/lib/asset";
 
 interface Preset {
   name: string;
@@ -172,7 +173,7 @@ export default function WhiteLabelDialog({ onClose }: { onClose: () => void }) {
               {/* Mock topbar */}
               <div className="h-9 flex items-center justify-center gap-2" style={{ backgroundColor: draft.brandColor }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/icons/logo.png" alt="" width={16} height={11} style={{ objectFit: "contain" }} />
+                <img src={asset("/icons/logo.png")} alt="" width={16} height={11} style={{ objectFit: "contain" }} />
                 <span className="text-white/90 text-[12px] font-normal tracking-[0.3px]">{draft.appName}</span>
               </div>
               {/* Mock body */}
