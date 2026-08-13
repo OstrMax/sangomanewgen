@@ -199,13 +199,13 @@ function DashboardView() {
                   </td>
                   <td className="py-3 text-right">
                     <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button className="p-1.5 rounded-lg transition-colors active:scale-90" data-tip="Hold" onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--th-bg-hover)"} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}>
+                      <button className="p-1.5 rounded-lg transition-colors active:scale-90" title="Hold" onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--th-bg-hover)"} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}>
                         <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="4" y="3" width="2.5" height="10" rx="1" fill="var(--th-text-muted)"/><rect x="9.5" y="3" width="2.5" height="10" rx="1" fill="var(--th-text-muted)"/></svg>
                       </button>
-                      <button className="p-1.5 rounded-lg transition-colors active:scale-90" data-tip="Transfer" onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--th-bg-hover)"} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}>
+                      <button className="p-1.5 rounded-lg transition-colors active:scale-90" title="Transfer" onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--th-bg-hover)"} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}>
                         <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M5 8h8m0 0l-3-3m3 3l-3 3M3 3v10" stroke="var(--th-text-muted)" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg>
                       </button>
-                      <button className="p-1.5 rounded-lg transition-colors active:scale-90" data-tip="End" onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--th-bg-hover)"} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}>
+                      <button className="p-1.5 rounded-lg transition-colors active:scale-90" title="End" onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--th-bg-hover)"} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}>
                         <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M12 4L4 12M4 4l8 8" stroke="var(--th-text-muted)" strokeWidth="1.5" strokeLinecap="round"/></svg>
                       </button>
                     </div>
@@ -455,16 +455,16 @@ function CallsView() {
                 <td className="px-4 py-3 text-[13px]" style={{ color: "var(--th-text-muted)" }}>{call.topic}</td>
                 <td className="px-4 py-3 text-center">
                   <div className="flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button className="p-1.5 rounded-lg transition-colors active:scale-90" data-tip="Listen" onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--th-bg-hover)"} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}>
+                    <button className="p-1.5 rounded-lg transition-colors active:scale-90" title="Listen" onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--th-bg-hover)"} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}>
                       <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 7v2a6 6 0 0012 0V7" stroke="var(--th-text-muted)" strokeWidth="1.3" strokeLinecap="round"/><rect x="1" y="7" width="3" height="5" rx="1" stroke="var(--th-text-muted)" strokeWidth="1.3"/><rect x="12" y="7" width="3" height="5" rx="1" stroke="var(--th-text-muted)" strokeWidth="1.3"/></svg>
                     </button>
-                    <button className="p-1.5 rounded-lg transition-colors active:scale-90" data-tip="Hold" onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--th-bg-hover)"} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}>
+                    <button className="p-1.5 rounded-lg transition-colors active:scale-90" title="Hold" onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--th-bg-hover)"} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}>
                       <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="4" y="3" width="2.5" height="10" rx="1" fill="var(--th-text-muted)"/><rect x="9.5" y="3" width="2.5" height="10" rx="1" fill="var(--th-text-muted)"/></svg>
                     </button>
-                    <button className="p-1.5 rounded-lg transition-colors active:scale-90" data-tip="Transfer" onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--th-bg-hover)"} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}>
+                    <button className="p-1.5 rounded-lg transition-colors active:scale-90" title="Transfer" onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--th-bg-hover)"} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}>
                       <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M5 8h8m0 0l-3-3m3 3l-3 3M3 3v10" stroke="var(--th-text-muted)" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg>
                     </button>
-                    <button className="p-1.5 rounded-lg transition-colors active:scale-90" data-tip="End" onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--th-bg-hover)"} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}>
+                    <button className="p-1.5 rounded-lg transition-colors active:scale-90" title="End" onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--th-bg-hover)"} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}>
                       <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M12 4L4 12M4 4l8 8" stroke="var(--th-text-muted)" strokeWidth="1.5" strokeLinecap="round"/></svg>
                     </button>
                   </div>
@@ -494,10 +494,10 @@ function CallsView() {
               <div className="flex items-center gap-2">
                 <span className="text-[12px] font-mono" style={{ color: "var(--th-text-muted)" }}>Waiting {caller.wait}</span>
                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button className="p-1 rounded transition-colors active:scale-90" data-tip="Answer" onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--th-bg-hover)"} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}>
+                  <button className="p-1 rounded transition-colors active:scale-90" title="Answer" onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--th-bg-hover)"} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}>
                     <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M14 10.67v2a1.33 1.33 0 01-1.45 1.33A13.2 13.2 0 016.8 12a13 13 0 01-4-4 13.2 13.2 0 01-2-5.72A1.33 1.33 0 012.13 1H4.13a1.33 1.33 0 011.34 1.15c.08.64.24 1.27.47 1.87a1.33 1.33 0 01-.3 1.4L4.8 6.27a10.67 10.67 0 004 4l.85-.85a1.33 1.33 0 011.4-.3c.6.23 1.23.39 1.87.47A1.33 1.33 0 0114 10.93z" stroke="var(--th-text-muted)" strokeWidth="1.2"/></svg>
                   </button>
-                  <button className="p-1 rounded transition-colors active:scale-90" data-tip="Transfer" onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--th-bg-hover)"} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}>
+                  <button className="p-1 rounded transition-colors active:scale-90" title="Transfer" onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--th-bg-hover)"} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}>
                     <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M5 8h8m0 0l-3-3m3 3l-3 3M3 3v10" stroke="var(--th-text-muted)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                   </button>
                 </div>

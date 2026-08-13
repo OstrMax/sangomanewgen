@@ -146,7 +146,7 @@ export default function OperatorConsolePage() {
               background: `linear-gradient(to right, var(--th-text-muted) 0%, var(--th-text-muted) ${volume}%, var(--th-border) ${volume}%, var(--th-border) 100%)`,
             }}
           />
-          <button className="flex items-center gap-1 shrink-0 ml-1" data-tip="Phone Settings">
+          <button className="flex items-center gap-1 shrink-0 ml-1" title="Phone Settings">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: "var(--th-text-muted)" }}>
               <circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />
             </svg>
@@ -167,19 +167,19 @@ export default function OperatorConsolePage() {
             </div>
             <div className="text-[12px] mb-3" style={{ color: "var(--th-call-card-muted, rgba(255,255,255,0.6))" }}>00:00:02</div>
             <div className="flex items-center gap-2">
-              <button className="flex items-center gap-1 rounded-full px-3 py-1.5 transition-colors active:scale-95" data-tip="Transfer call" style={{ backgroundColor: "var(--th-call-btn-bg, white)", color: "var(--th-call-btn-text, #001221)" }}>
+              <button className="flex items-center gap-1 rounded-full px-3 py-1.5 transition-colors active:scale-95" title="Transfer call" style={{ backgroundColor: "var(--th-call-btn-bg, white)", color: "var(--th-call-btn-text, #001221)" }}>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                 <span className="text-[12px] font-medium">Blind</span>
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"/></svg>
               </button>
               <div className="flex-1" />
-              <button className="w-9 h-9 rounded-full flex items-center justify-center transition-colors active:scale-95" data-tip="Hold" style={{ backgroundColor: "var(--th-call-action-bg, rgba(255,255,255,0.1))" }}>
+              <button className="w-9 h-9 rounded-full flex items-center justify-center transition-colors active:scale-95" title="Hold" style={{ backgroundColor: "var(--th-call-action-bg, rgba(255,255,255,0.1))" }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--th-call-card-text, white)" strokeWidth="2"><line x1="8" y1="5" x2="8" y2="19"/><line x1="16" y1="5" x2="16" y2="19"/></svg>
               </button>
-              <button className="w-9 h-9 rounded-full flex items-center justify-center transition-colors active:scale-95" data-tip="Park" style={{ backgroundColor: "var(--th-call-action-bg, rgba(255,255,255,0.1))" }}>
+              <button className="w-9 h-9 rounded-full flex items-center justify-center transition-colors active:scale-95" title="Park" style={{ backgroundColor: "var(--th-call-action-bg, rgba(255,255,255,0.1))" }}>
                 <span className="text-[13px] font-bold" style={{ color: "var(--th-call-card-text, white)" }}>P</span>
               </button>
-              <button className="w-9 h-9 rounded-full bg-[#EF4444] flex items-center justify-center hover:bg-[#dc3545] transition-all active:scale-90" data-tip="End call">
+              <button className="w-9 h-9 rounded-full bg-[#EF4444] flex items-center justify-center hover:bg-[#dc3545] transition-all active:scale-90" title="End call">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4.32564 12.1201C5.47897 11.9481 6.42229 11.5697 6.44429 10.4146L6.4556 9.72167C6.464 9.2154 5.78853 7.66424 9.96947 7.66096C14.1454 7.65328 13.4184 9.20775 13.4052 9.71277L13.3941 10.4089C13.375 11.5606 14.3024 11.9371 15.4514 12.1067L16.1447 12.2107C17.2919 12.3757 18.2292 12.2774 18.2514 11.1255L18.2599 10.4991C18.311 10.0246 18.3529 8.61362 17.2413 7.28151C15.9087 5.68225 13.4754 4.87232 10.0172 4.87638C6.55883 4.87729 4.0967 5.69704 2.70646 7.30024C1.55202 8.63383 1.54033 10.0474 1.57292 10.5207L1.56446 11.1471C1.54229 12.299 2.47557 12.3955 3.63039 12.2217L4.32564 12.1201Z" fill="white"/></svg>
               </button>
             </div>
@@ -196,13 +196,13 @@ export default function OperatorConsolePage() {
             </div>
             <div className="text-[12px] mb-3" style={{ color: "var(--th-call-card-muted, rgba(255,255,255,0.6))" }}>Ringing...</div>
             <div className="flex items-center gap-2">
-              <button className="w-9 h-9 rounded-full flex items-center justify-center transition-colors active:scale-95" data-tip="Speaker" style={{ backgroundColor: "var(--th-call-action-bg, rgba(255,255,255,0.1))" }}>
+              <button className="w-9 h-9 rounded-full flex items-center justify-center transition-colors active:scale-95" title="Speaker" style={{ backgroundColor: "var(--th-call-action-bg, rgba(255,255,255,0.1))" }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--th-call-card-text, white)" strokeWidth="1.5"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/></svg>
               </button>
-              <button className="w-9 h-9 rounded-full bg-[#34C759] flex items-center justify-center hover:bg-[#2daa4e] transition-colors active:scale-95" data-tip="Answer">
+              <button className="w-9 h-9 rounded-full bg-[#34C759] flex items-center justify-center hover:bg-[#2daa4e] transition-colors active:scale-95" title="Answer">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
               </button>
-              <button className="w-9 h-9 rounded-full bg-[#EF4444] flex items-center justify-center hover:bg-[#dc3545] transition-colors active:scale-95" data-tip="Decline">
+              <button className="w-9 h-9 rounded-full bg-[#EF4444] flex items-center justify-center hover:bg-[#dc3545] transition-colors active:scale-95" title="Decline">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </button>
             </div>
@@ -218,7 +218,7 @@ export default function OperatorConsolePage() {
               <span className="text-[13px] font-medium" style={{ color: "var(--th-call-card-text, white)" }}>{hold.number}</span>
               <div className="flex items-center gap-2">
                 <span className="text-[12px] font-mono" style={{ color: "var(--th-call-card-muted, rgba(255,255,255,0.6))" }}>{hold.time}</span>
-                <button className="w-7 h-7 rounded-full flex items-center justify-center transition-colors active:scale-95" data-tip="Resume call" style={{ backgroundColor: "var(--th-call-action-bg, rgba(255,255,255,0.1))" }}>
+                <button className="w-7 h-7 rounded-full flex items-center justify-center transition-colors active:scale-95" title="Resume call" style={{ backgroundColor: "var(--th-call-action-bg, rgba(255,255,255,0.1))" }}>
                   <svg width="13" height="13" viewBox="0 0 28 28" fill="var(--th-call-card-text, white)"><path d="M21.76 18.2c-1.3-1.1-2.61-1.78-3.89-.67l-.77.67c-.56.49-1.56 2.76-5.58-1.87-4.02-4.62-1.61-5.34-1.15-5.82l.77-.67c1.27-1.11.79-2.51-.13-3.94l-.55-.87c-.74-1.15-1.75-2.1-3.02-.99l-.7.6c-.56.41-2.14 1.75-2.52 4.29-.46 3.04.72 6.53 4.05 10.36 3.32 3.83 6.58 5.75 9.66 5.72 2.56-.03 4.11-1.4 4.6-1.9l.69-.61c1.28-1.1.49-2.24-.79-3.35l-.78-.63z"/></svg>
                 </button>
               </div>
@@ -241,7 +241,7 @@ export default function OperatorConsolePage() {
               onClick={() => setPhoneInput("")}
               className="shrink-0 w-6 h-6 flex items-center justify-center rounded-full transition-colors"
               style={{ color: "var(--th-text-muted)" }}
-              data-tip="Backspace"
+              title="Backspace"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><line x1="15" y1="9" x2="9" y2="15" /><line x1="9" y1="9" x2="15" y2="15" /></svg>
             </button>
@@ -255,7 +255,8 @@ export default function OperatorConsolePage() {
               <button
                 key={key.digit}
                 onClick={() => setPhoneInput((prev) => prev + key.digit)}
-                className="dial-key flex flex-col items-center justify-center w-16 h-16 rounded-full"
+                className="flex flex-col items-center justify-center w-16 h-16 rounded-full active:scale-95 transition-all hover:bg-[var(--th-bg-hover)]"
+                style={{ backgroundColor: "transparent", border: "1px solid var(--th-border)", color: "var(--th-text-primary)" }}
               >
                 <span className="text-2xl font-normal">{key.digit}</span>
                 {key.sub && (
@@ -271,7 +272,7 @@ export default function OperatorConsolePage() {
               setCalling(true);
             }}
             className="btn-call w-16 h-16 rounded-full bg-[#34C759] flex items-center justify-center shadow-lg"
-            data-tip="Make a call"
+            title="Make a call"
           >
             <svg width="22" height="22" viewBox="0 0 28 28" fill="white"><path d="M21.76 18.2c-1.3-1.1-2.61-1.78-3.89-.67l-.77.67c-.56.49-1.56 2.76-5.58-1.87-4.02-4.62-1.61-5.34-1.15-5.82l.77-.67c1.27-1.11.79-2.51-.13-3.94l-.55-.87c-.74-1.15-1.75-2.1-3.02-.99l-.7.6c-.56.41-2.14 1.75-2.52 4.29-.46 3.04.72 6.53 4.05 10.36 3.32 3.83 6.58 5.75 9.66 5.72 2.56-.03 4.11-1.4 4.6-1.9l.69-.61c1.28-1.1.49-2.24-.79-3.35l-.78-.63z"/></svg>
           </button>
@@ -337,11 +338,11 @@ export default function OperatorConsolePage() {
             </button>
           </div>
           <div className="flex items-center gap-4">
-            <button onClick={() => setEditGroupView(true)} className="text-xs font-bold tracking-[0.24px] uppercase" data-tip="Edit group" style={{ color: "var(--th-tab-active)" }}>
+            <button onClick={() => setEditGroupView(true)} className="text-xs font-bold tracking-[0.24px] uppercase" title="Edit group" style={{ color: "var(--th-tab-active)" }}>
               Edit group
             </button>
             {activeFilter === "EXTERNAL" && (
-              <button onClick={() => setShowAddContact(true)} className="flex items-center gap-1 text-xs font-bold tracking-[0.24px] uppercase" data-tip="Add new contact" style={{ color: "var(--th-tab-active)" }}>
+              <button onClick={() => setShowAddContact(true)} className="flex items-center gap-1 text-xs font-bold tracking-[0.24px] uppercase" title="Add new contact" style={{ color: "var(--th-tab-active)" }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
                 Add Contact
               </button>
@@ -374,7 +375,7 @@ export default function OperatorConsolePage() {
             <button
               onClick={() => setGridView(false)}
               className="p-1 transition-colors"
-              data-tip="Show list view"
+              title="Show list view"
               style={{ backgroundColor: !gridView ? "var(--th-text-primary)" : "transparent" }}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={!gridView ? "var(--th-bg)" : "var(--th-text-muted)"} strokeWidth="2"><line x1="8" y1="6" x2="21" y2="6" /><line x1="8" y1="12" x2="21" y2="12" /><line x1="8" y1="18" x2="21" y2="18" /><line x1="3" y1="6" x2="3.01" y2="6" /><line x1="3" y1="12" x2="3.01" y2="12" /><line x1="3" y1="18" x2="3.01" y2="18" /></svg>
@@ -383,7 +384,7 @@ export default function OperatorConsolePage() {
             <button
               onClick={() => setGridView(true)}
               className="p-1 transition-colors"
-              data-tip="Show grid view"
+              title="Show grid view"
               style={{ backgroundColor: gridView ? "var(--th-text-primary)" : "transparent" }}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={gridView ? "var(--th-bg)" : "var(--th-text-muted)"} strokeWidth="2"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /></svg>
@@ -504,7 +505,7 @@ export default function OperatorConsolePage() {
                       <div>{row.time}</div>
                     </td>
                     <td className="py-3 text-center">
-                      <button className="p-1 rounded-lg transition-colors" data-tip="More" onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--th-bg-hover)"} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}>
+                      <button className="p-1 rounded-lg transition-colors" title="More" onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--th-bg-hover)"} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--th-text-muted)"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
                       </button>
                     </td>
@@ -540,16 +541,16 @@ export default function OperatorConsolePage() {
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9" /></svg>
             </button>
             <div className="flex items-center gap-1">
-              <button className="p-1 rounded" style={{ color: "var(--th-text-muted)" }} data-tip="First page">
+              <button className="p-1 rounded" style={{ color: "var(--th-text-muted)" }} title="First page">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="11 17 6 12 11 7" /><line x1="6" y1="12" x2="6" y2="12" /></svg>
               </button>
-              <button className="p-1 rounded" style={{ color: "var(--th-text-muted)" }} data-tip="Previous page">
+              <button className="p-1 rounded" style={{ color: "var(--th-text-muted)" }} title="Previous page">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6" /></svg>
               </button>
-              <button className="p-1 rounded" style={{ color: "var(--th-text-muted)" }} data-tip="Next page">
+              <button className="p-1 rounded" style={{ color: "var(--th-text-muted)" }} title="Next page">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg>
               </button>
-              <button className="p-1 rounded" style={{ color: "var(--th-text-muted)" }} data-tip="Last page">
+              <button className="p-1 rounded" style={{ color: "var(--th-text-muted)" }} title="Last page">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="13 17 18 12 13 7" /><line x1="18" y1="12" x2="18" y2="12" /></svg>
               </button>
             </div>
@@ -593,7 +594,7 @@ export default function OperatorConsolePage() {
                     <div>{row.time}</div>
                   </td>
                   <td className="py-3 text-center">
-                    <button className="p-1 rounded-lg transition-colors" data-tip="More" onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--th-bg-hover)"} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}>
+                    <button className="p-1 rounded-lg transition-colors" title="More" onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--th-bg-hover)"} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}>
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--th-text-muted)"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
                     </button>
                   </td>
@@ -768,7 +769,7 @@ function AddContactDialog({ onClose }: { onClose: () => void }) {
         {/* Header */}
         <div className="flex items-center justify-between px-6 pt-6 pb-2">
           <h2 className="text-lg font-semibold" style={{ color: "var(--th-text-primary)" }}>Add new contact</h2>
-          <button onClick={onClose} className="p-1.5 rounded-lg transition-colors hover:bg-[var(--th-bg-hover)]" data-tip="Close">
+          <button onClick={onClose} className="p-1.5 rounded-lg transition-colors hover:bg-[var(--th-bg-hover)]" title="Close">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--th-text-muted)" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
         </div>
@@ -904,7 +905,7 @@ function ContactCard({ contact }: { contact: Contact }) {
         </div>
 
         {/* Phone icon */}
-        <button className="p-1 shrink-0 rounded-full transition-all active:scale-90" data-tip="Make a call">
+        <button className="p-1 shrink-0 rounded-full transition-all active:scale-90" title="Make a call">
           <svg width="18" height="18" viewBox="0 0 28 28" fill="var(--th-text-muted)"><path d="M21.76 18.2c-1.3-1.1-2.61-1.78-3.89-.67l-.77.67c-.56.49-1.56 2.76-5.58-1.87-4.02-4.62-1.61-5.34-1.15-5.82l.77-.67c1.27-1.11.79-2.51-.13-3.94l-.55-.87c-.74-1.15-1.75-2.1-3.02-.99l-.7.6c-.56.41-2.14 1.75-2.52 4.29-.46 3.04.72 6.53 4.05 10.36 3.32 3.83 6.58 5.75 9.66 5.72 2.56-.03 4.11-1.4 4.6-1.9l.69-.61c1.28-1.1.49-2.24-.79-3.35l-.78-.63z"/></svg>
         </button>
       </div>

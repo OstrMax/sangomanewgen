@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import CallPopup from "@/components/talk/CallPopup";
 
 const favorites = [
@@ -54,34 +54,11 @@ const messages: Message[] = [
   { id: 7, sender: "Cody Russell", avatar: "CR", avatarColor: "#7C3AED", time: "3:27 PM", text: "Hi Jim! Got time to discuss the doc?", reactions: [{ emoji: "👍", count: 2 }, { emoji: "💬", count: 2 }, { emoji: "💯", count: 1 }], dividerBefore: "Today" },
 ];
 
-const PLACEHOLDER_PROMPTS = [
-  "Type your message here",
-  "Write something good",
-  "Share an idea with the team",
-  "What's on your mind?",
-  "Ask anything, we'll help",
-  "Drop a quick update",
-];
-
 export default function ChatsPage() {
   const [activeChannel, setActiveChannel] = useState("Jim Dowell");
   const [messageInput, setMessageInput] = useState("");
   const [calling, setCalling] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
-  const [placeholderIdx, setPlaceholderIdx] = useState(0);
-  const [placeholderVisible, setPlaceholderVisible] = useState(true);
-
-  // Rotate the chat placeholder every ~3.6s with a soft fade.
-  useEffect(() => {
-    const tick = setInterval(() => {
-      setPlaceholderVisible(false);
-      setTimeout(() => {
-        setPlaceholderIdx((i) => (i + 1) % PLACEHOLDER_PROMPTS.length);
-        setPlaceholderVisible(true);
-      }, 280);
-    }, 3600);
-    return () => clearInterval(tick);
-  }, []);
 
   return (
     <div className="flex h-full">
@@ -94,7 +71,7 @@ export default function ChatsPage() {
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7F888F" strokeWidth="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
               <input type="text" placeholder="Find channel" className="bg-transparent outline-none text-sm placeholder:text-[#7F888F] w-full" style={{ color: 'var(--th-text-primary)' }} />
             </div>
-            <button data-tip="Filter channels" data-tip-pos="right" className="p-2 text-[color:var(--th-text-muted)] rounded-lg transition-colors hover:bg-[var(--th-bg-hover)]">
+            <button className="p-2 text-[color:var(--th-text-muted)] rounded-lg transition-colors hover:bg-[var(--th-bg-hover)]" title="Filter channels">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
             </button>
           </div>
@@ -143,15 +120,15 @@ export default function ChatsPage() {
           </div>
           <div className="flex items-center gap-[13px]">
             {/* Meet icon */}
-            <button onClick={() => setCalling(true)} data-tip="Start video call" data-tip-pos="bottom" className="w-9 h-9 flex items-center justify-center rounded-lg transition-colors hover:bg-[var(--th-bg-hover)]">
+            <button onClick={() => setCalling(true)} className="w-9 h-9 flex items-center justify-center rounded-lg transition-colors hover:bg-[var(--th-bg-hover)]" title="Start video call">
               <svg width="24" height="24" viewBox="0 0 31 32" fill="none"><path d="M24.8047 12.3957C24.5345 11.8045 23.8725 11.4548 23.2419 11.6123C22.7634 11.7317 22.2509 12.0093 21.715 12.3704C21.4735 12.5332 21.3667 12.8295 21.4434 13.1104C21.9673 15.0343 21.9673 16.9655 21.4434 18.8894C21.3667 19.1703 21.4735 19.4673 21.715 19.6295C22.2516 19.9905 22.7641 20.2681 23.2425 20.3875C23.8732 20.545 24.5351 20.1947 24.8054 19.6034C25.7316 17.5748 25.7316 14.425 24.8047 12.3957ZM7.45775 10.5913C11.1527 9.19191 14.8477 9.19191 18.5426 10.5913C18.8689 10.7147 19.1485 10.9643 19.3107 11.2846C20.8969 14.4284 20.8969 17.5721 19.3107 20.7152C19.1492 21.0355 18.8696 21.2851 18.5426 21.4085C14.8477 22.8079 11.1527 22.8079 7.45775 21.4085C7.13143 21.2851 6.85182 21.0355 6.68966 20.7152C5.10345 17.5714 5.10345 14.4284 6.68966 11.2846C6.85182 10.9643 7.13143 10.7147 7.45775 10.5913Z" fill="var(--th-text-primary)"/></svg>
             </button>
             {/* Talk/Phone icon */}
-            <button onClick={() => setCalling(true)} data-tip="Start voice call" data-tip-pos="bottom" className="w-9 h-9 flex items-center justify-center rounded-lg transition-colors hover:bg-[var(--th-bg-hover)]">
+            <button onClick={() => setCalling(true)} className="w-9 h-9 flex items-center justify-center rounded-lg transition-colors hover:bg-[var(--th-bg-hover)]" title="Start voice call">
               <svg width="22" height="22" viewBox="0 0 28 28" fill="var(--th-text-primary)"><path d="M21.76 18.2c-1.3-1.1-2.61-1.78-3.89-.67l-.77.67c-.56.49-1.56 2.76-5.58-1.87-4.02-4.62-1.61-5.34-1.15-5.82l.77-.67c1.27-1.11.79-2.51-.13-3.94l-.55-.87c-.74-1.15-1.75-2.1-3.02-.99l-.7.6c-.56.41-2.14 1.75-2.52 4.29-.46 3.04.72 6.53 4.05 10.36 3.32 3.83 6.58 5.75 9.66 5.72 2.56-.03 4.11-1.4 4.6-1.9l.69-.61c1.28-1.1.49-2.24-.79-3.35l-.78-.63z"/></svg>
             </button>
             {/* Info icon */}
-            <button onClick={() => setShowInfo(!showInfo)} data-tip="Contact info" data-tip-pos="bottom" className="w-8 h-8 flex items-center justify-center rounded-lg transition-colors hover:bg-[var(--th-bg-hover)]">
+            <button onClick={() => setShowInfo(!showInfo)} className="w-8 h-8 flex items-center justify-center rounded-lg transition-colors hover:bg-[var(--th-bg-hover)]" title="Contact info">
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M9.99935 1.66675C5.39935 1.66675 1.66602 5.40008 1.66602 10.0001C1.66602 14.6001 5.39935 18.3334 9.99935 18.3334C14.5993 18.3334 18.3327 14.6001 18.3327 10.0001C18.3327 5.40008 14.5993 1.66675 9.99935 1.66675ZM9.99935 14.1667C9.54102 14.1667 9.16602 13.7917 9.16602 13.3334V10.0001C9.16602 9.54175 9.54102 9.16675 9.99935 9.16675C10.4577 9.16675 10.8327 9.54175 10.8327 10.0001V13.3334C10.8327 13.7917 10.4577 14.1667 9.99935 14.1667ZM10.8327 7.50008H9.16602V5.83341H10.8327V7.50008Z" fill="var(--th-text-primary)"/></svg>
             </button>
           </div>
@@ -186,7 +163,7 @@ export default function ChatsPage() {
                         <p className="text-sm font-medium" style={{ color: 'var(--th-text-primary)' }}>{msg.metadata.callTitle}</p>
                         <p className="text-xs" style={{ color: 'var(--th-text-muted)' }}>{msg.metadata.duration} · {msg.metadata.participants} participants</p>
                       </div>
-                      <button className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all active:scale-95" data-tip="Join call" style={{ backgroundColor: 'var(--th-text-primary)', color: 'var(--th-bg)' }}>Join</button>
+                      <button className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all active:scale-95" title="Join call" style={{ backgroundColor: 'var(--th-text-primary)', color: 'var(--th-bg)' }}>Join</button>
                     </div>
                   )}
 
@@ -245,7 +222,7 @@ export default function ChatsPage() {
                           {r.emoji}{r.count > 0 && <span className="text-[color:var(--th-text-muted)]">{r.count}</span>}
                         </span>
                       ))}
-                      <button className="w-6 h-6 flex items-center justify-center rounded-full text-[color:var(--th-text-muted)] text-xs transition-colors hover:bg-[var(--th-bg-hover)]" data-tip="Add reaction">😊</button>
+                      <button className="w-6 h-6 flex items-center justify-center rounded-full text-[color:var(--th-text-muted)] text-xs transition-colors hover:bg-[var(--th-bg-hover)]" title="Add reaction">😊</button>
                     </div>
                   )}
                 </div>
@@ -256,26 +233,16 @@ export default function ChatsPage() {
 
         {/* Message input */}
         <div className="px-5 pb-4">
-          <div className="glass-composer flex items-center gap-3 rounded-xl px-4 py-2.5">
-            <div className="relative flex-1">
-              <input
-                type="text"
-                value={messageInput}
-                onChange={(e) => setMessageInput(e.target.value)}
-                className="w-full outline-none text-sm bg-transparent relative z-10"
-                style={{ color: 'var(--th-text-primary)' }}
-              />
-              {messageInput.length === 0 && (
-                <span
-                  aria-hidden="true"
-                  className="pointer-events-none absolute inset-y-0 left-0 flex items-center text-sm text-[#7F888F] transition-opacity duration-300"
-                  style={{ opacity: placeholderVisible ? 1 : 0 }}
-                >
-                  {PLACEHOLDER_PROMPTS[placeholderIdx]}
-                </span>
-              )}
-            </div>
-            <button data-tip="Send message" className="glass-send w-9 h-9 rounded-full flex items-center justify-center shrink-0" style={{ background: "linear-gradient(180deg, #AE0D8A 0%, #64168E 47.6%, #2F1155 100%)" }}>
+          <div className="flex items-center gap-3 rounded-xl px-4 py-2.5" style={{ border: '1px solid var(--th-border)', backgroundColor: 'var(--th-bg-input)' }}>
+            <input
+              type="text"
+              placeholder="Ask anything or select"
+              value={messageInput}
+              onChange={(e) => setMessageInput(e.target.value)}
+              className="flex-1 outline-none text-sm placeholder:text-[#7F888F] bg-transparent"
+              style={{ color: 'var(--th-text-primary)' }}
+            />
+            <button className="w-9 h-9 rounded-full flex items-center justify-center hover:opacity-90 transition-opacity shrink-0" title="Send message" style={{ background: "linear-gradient(180deg, #AE0D8A 0%, #64168E 47.6%, #2F1155 100%)" }}>
               <svg width="16" height="15" viewBox="0 0 16 15" fill="none"><path d="M14.5439 0.820147C12.4104 -1.22485 5.54146 1.16452 4.76577 1.44327C2.63493 2.21015 0.0788345 3.3864 0.00205328 4.6414C-0.085228 6.36952 2.6264 8.10015 5.02696 8.77515C5.14246 8.80765 5.26715 8.77515 5.35246 8.6939L9.66533 4.5864C9.92193 4.34202 10.3367 4.34202 10.5933 4.5864C10.8499 4.83077 10.8499 5.22577 10.5933 5.47015L6.26924 9.58827C6.18393 9.66952 6.1498 9.78827 6.18327 9.89827C6.90121 12.2458 8.77349 14.6683 10.508 14.6683C10.5217 14.6683 10.5362 14.6683 10.55 14.6683C11.9419 14.5633 13.2524 11.6995 13.9093 10.0026C14.1941 9.27015 16.6183 2.79765 14.5439 0.820147Z" fill="white"/></svg>
             </button>
           </div>
@@ -286,7 +253,7 @@ export default function ChatsPage() {
         <div className="w-[340px] shrink-0 flex flex-col overflow-hidden animate-[slideInRight_0.3s_ease-out]" style={{ backgroundColor: 'var(--th-bg)', borderLeft: '1px solid var(--th-border)' }}>
           <div className="flex items-center justify-between px-5 h-14 shrink-0" style={{ borderBottom: '1px solid var(--th-border)' }}>
             <span className="text-[15px] font-semibold" style={{ color: 'var(--th-text-primary)' }}>Contact Info</span>
-            <button onClick={() => setShowInfo(false)} className="p-1.5 rounded-lg transition-colors hover:bg-[var(--th-bg-hover)]" data-tip="Close">
+            <button onClick={() => setShowInfo(false)} className="p-1.5 rounded-lg transition-colors hover:bg-[var(--th-bg-hover)]" title="Close">
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M13.5 4.5L4.5 13.5" stroke="var(--th-text-primary)" strokeWidth="1.5" strokeLinecap="round"/><path d="M4.5 4.5L13.5 13.5" stroke="var(--th-text-primary)" strokeWidth="1.5" strokeLinecap="round"/></svg>
             </button>
           </div>

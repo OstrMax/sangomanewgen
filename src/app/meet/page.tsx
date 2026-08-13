@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
-import { asset } from "@/lib/asset";
 
 /* ── End call icon (from provided SVG) ── */
 const EndCallIcon = ({ size = 20 }: { size?: number }) => (
@@ -259,7 +258,7 @@ function MeetingView({ title, onEnd, onMinimize }: { title: string; onEnd: () =>
         <div className="absolute top-0 left-0 right-0 z-20 flex items-center px-[24px] pt-[24px]">
           {/* Sangoma logo */}
           <div className="shrink-0 mr-4">
-            <Image src={asset("/icons/sangoma-logo.png")} alt="Sangoma" width={43} height={29} className="opacity-90" />
+            <Image src="/icons/sangoma-logo.png" alt="Sangoma" width={43} height={29} className="opacity-90" />
           </div>
 
           {/* Meeting ID / Title pill + HD — centered */}
@@ -286,7 +285,7 @@ function MeetingView({ title, onEnd, onMinimize }: { title: string; onEnd: () =>
 
           {/* Minimize button */}
           {onMinimize && (
-            <button onClick={onMinimize} className="p-2 rounded-lg hover:bg-white/10 transition-colors ml-4 shrink-0" data-tip="Minimize">
+            <button onClick={onMinimize} className="p-2 rounded-lg hover:bg-white/10 transition-colors ml-4 shrink-0" title="Minimize">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5"><path d="M4 14h6v6M20 10h-6V4M14 10l7-7M10 14l-7 7"/></svg>
             </button>
           )}
@@ -342,22 +341,22 @@ function MeetingView({ title, onEnd, onMinimize }: { title: string; onEnd: () =>
           <div className="flex items-center gap-[8px] rounded-[1000px] px-2 py-1.5"
             style={{ background: "rgba(255,255,255,0.08)", backdropFilter: "blur(40px)", WebkitBackdropFilter: "blur(40px)", boxShadow: "0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1)" }}>
             {/* Mic with caret */}
-            <button onClick={() => setMicOn(!micOn)} className={`relative w-[52px] h-[52px] rounded-full flex items-center justify-center transition-all active:scale-90 ${micOn ? "hover:bg-white/10" : "bg-[#EF4444] hover:bg-[#DC2626]"}`} data-tip="Mute">
+            <button onClick={() => setMicOn(!micOn)} className={`relative w-[52px] h-[52px] rounded-full flex items-center justify-center transition-all active:scale-90 ${micOn ? "hover:bg-white/10" : "bg-[#EF4444] hover:bg-[#DC2626]"}`} title="Mute">
               <MicIcon />
               <ToolbarCaret />
             </button>
             {/* Camera with caret */}
-            <button onClick={() => setCamOn(!camOn)} className={`relative w-[52px] h-[52px] rounded-full flex items-center justify-center transition-all active:scale-90 ${camOn ? "hover:bg-white/10" : "bg-[#EF4444] hover:bg-[#DC2626]"}`} data-tip="Camera">
+            <button onClick={() => setCamOn(!camOn)} className={`relative w-[52px] h-[52px] rounded-full flex items-center justify-center transition-all active:scale-90 ${camOn ? "hover:bg-white/10" : "bg-[#EF4444] hover:bg-[#DC2626]"}`} title="Camera">
               <VideoIcon />
               <ToolbarCaret />
             </button>
             {/* CC with caret */}
-            <button onClick={toggleCC} className={`relative w-[52px] h-[52px] rounded-full flex items-center justify-center transition-all active:scale-90 ${showCC ? "bg-white/20" : "hover:bg-white/10"}`} data-tip="Closed Captions">
+            <button onClick={toggleCC} className={`relative w-[52px] h-[52px] rounded-full flex items-center justify-center transition-all active:scale-90 ${showCC ? "bg-white/20" : "hover:bg-white/10"}`} title="Closed Captions">
               <CCIcon />
               <ToolbarCaret />
             </button>
             {/* Record */}
-            <button onClick={toggleRecording} className={`w-[52px] h-[52px] rounded-full flex items-center justify-center transition-all active:scale-90 ${recording ? "bg-[#EF4444]/30" : "hover:bg-white/10"}`} data-tip="Record">
+            <button onClick={toggleRecording} className={`w-[52px] h-[52px] rounded-full flex items-center justify-center transition-all active:scale-90 ${recording ? "bg-[#EF4444]/30" : "hover:bg-white/10"}`} title="Record">
               {recording ? (
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#EF4444" strokeWidth="1.5"/><rect x="8" y="8" width="8" height="8" rx="1" fill="#EF4444"/></svg>
               ) : (
@@ -365,27 +364,27 @@ function MeetingView({ title, onEnd, onMinimize }: { title: string; onEnd: () =>
               )}
             </button>
             {/* Share screen */}
-            <button className="w-[52px] h-[52px] rounded-full flex items-center justify-center hover:bg-white/10 transition-all active:scale-90" data-tip="Share screen">
+            <button className="w-[52px] h-[52px] rounded-full flex items-center justify-center hover:bg-white/10 transition-all active:scale-90" title="Share screen">
               <ShareScreenIcon />
             </button>
             {/* Chat */}
-            <button className="w-[52px] h-[52px] rounded-full flex items-center justify-center hover:bg-white/10 transition-all active:scale-90" data-tip="Chat">
+            <button className="w-[52px] h-[52px] rounded-full flex items-center justify-center hover:bg-white/10 transition-all active:scale-90" title="Chat">
               <ChatIcon />
             </button>
             {/* Raise hand */}
-            <button className="w-[52px] h-[52px] rounded-full flex items-center justify-center hover:bg-white/10 transition-all active:scale-90" data-tip="Raise hand">
+            <button className="w-[52px] h-[52px] rounded-full flex items-center justify-center hover:bg-white/10 transition-all active:scale-90" title="Raise hand">
               <HandIcon />
             </button>
             {/* Conference / participants */}
-            <button onClick={toggleParticipants} className={`w-[52px] h-[52px] rounded-full flex items-center justify-center transition-all active:scale-90 ${showParticipants ? "bg-white/20" : "hover:bg-white/10"}`} data-tip="Participants">
+            <button onClick={toggleParticipants} className={`w-[52px] h-[52px] rounded-full flex items-center justify-center transition-all active:scale-90 ${showParticipants ? "bg-white/20" : "hover:bg-white/10"}`} title="Participants">
               <ConferenceIcon />
             </button>
             {/* More */}
-            <button className="w-[52px] h-[52px] rounded-full flex items-center justify-center hover:bg-white/10 transition-all active:scale-90" data-tip="More">
+            <button className="w-[52px] h-[52px] rounded-full flex items-center justify-center hover:bg-white/10 transition-all active:scale-90" title="More">
               <MoreIcon />
             </button>
             {/* End call */}
-            <button onClick={onEnd} className="w-[52px] h-[52px] rounded-[1000px] bg-[#c70816] flex items-center justify-center hover:bg-[#a90612] transition-all active:scale-90" data-tip="End call">
+            <button onClick={onEnd} className="w-[52px] h-[52px] rounded-[1000px] bg-[#c70816] flex items-center justify-center hover:bg-[#a90612] transition-all active:scale-90" title="End call">
               <EndCallIcon size={24} />
             </button>
           </div>
@@ -675,8 +674,8 @@ function RecordingsContent() {
               <div className="flex-1 min-w-0"><div className="text-[14px] font-medium text-[var(--th-text-primary)]">{rec.title}</div><div className="text-[12px] text-[var(--th-text-muted)] mt-0.5">{rec.date} · {rec.duration}</div></div>
               <span className="text-[12px] text-[var(--th-text-muted)] shrink-0">{rec.size}</span>
               <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button className="p-1.5 rounded-lg hover:bg-[var(--th-bg-hover)] active:scale-90 transition-all" data-tip="Download"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v9m0 0l-3-3m3 3l3-3M3 13h10" stroke="var(--th-text-muted)" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg></button>
-                <button className="p-1.5 rounded-lg hover:bg-[var(--th-bg-hover)] active:scale-90 transition-all" data-tip="Delete"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 5h8l-.667 8H4.667L4 5zM6 3h4M3 5h10" stroke="var(--th-text-muted)" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg></button>
+                <button className="p-1.5 rounded-lg hover:bg-[var(--th-bg-hover)] active:scale-90 transition-all" title="Download"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v9m0 0l-3-3m3 3l3-3M3 13h10" stroke="var(--th-text-muted)" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg></button>
+                <button className="p-1.5 rounded-lg hover:bg-[var(--th-bg-hover)] active:scale-90 transition-all" title="Delete"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 5h8l-.667 8H4.667L4 5zM6 3h4M3 5h10" stroke="var(--th-text-muted)" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg></button>
               </div>
             </div>
           ))}

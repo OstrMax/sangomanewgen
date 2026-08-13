@@ -6,9 +6,7 @@ import ProfileDropdown from "@/components/profile/ProfileDropdown";
 import SettingsDropdown from "@/components/layout/SettingsDropdown";
 import CustomizeTabsDialog from "@/components/layout/CustomizeTabsDialog";
 import WhiteLabelDialog from "@/components/layout/WhiteLabelDialog";
-import FaxSettingsDialog from "@/components/layout/FaxSettingsDialog";
 import { PassiveAIIcon, ActiveAIIcon } from "@/components/ai/AIAssistPanel";
-import { asset } from "@/lib/asset";
 
 export default function Header({
   aiPanelOpen,
@@ -21,7 +19,6 @@ export default function Header({
   const [showSettings, setShowSettings] = useState(false);
   const [showCustomizeTabs, setShowCustomizeTabs] = useState(false);
   const [showBranding, setShowBranding] = useState(false);
-  const [showFaxSettings, setShowFaxSettings] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
   const settingsRef = useRef<HTMLDivElement>(null);
 
@@ -41,8 +38,8 @@ export default function Header({
   return (
     <div className="flex items-center gap-1 px-3 py-1 w-full h-11 shrink-0">
       {/* Grid/channels icon */}
-      <button data-tip="Apps & channels" data-tip-pos="bottom" className="p-1.5 rounded hover:bg-white/10 transition-colors">
-        <Image src={asset("/icons/channels.svg")} alt="Apps" width={22} height={22} />
+      <button className="p-1.5 rounded hover:bg-white/10 transition-colors">
+        <Image src="/icons/channels.svg" alt="Apps" width={22} height={22} />
       </button>
 
       <div className="flex-1" />
@@ -56,7 +53,7 @@ export default function Header({
           boxShadow: "0 1px 2px rgba(0,0,0,0.08)",
         }}
       >
-        <Image src={asset("/icons/search.svg")} alt="Search" width={16} height={16} className="opacity-70 group-hover:opacity-100 transition-opacity" />
+        <Image src="/icons/search.svg" alt="Search" width={16} height={16} className="opacity-70 group-hover:opacity-100 transition-opacity" />
         <span className="ml-2 text-sm" style={{ color: "var(--th-text-muted)" }}>Search</span>
       </button>
 
@@ -67,10 +64,12 @@ export default function Header({
         {/* AI Assist toggle */}
         <button
           onClick={onToggleAI}
-          data-active={aiPanelOpen ? "true" : "false"}
-          data-tip={aiPanelOpen ? "Close AI Assist" : "Open AI Assist"}
-          data-tip-pos="bottom"
-          className="ai-toggle p-1.5 rounded-full"
+          className={`p-1.5 rounded-full transition-all duration-200 ${
+            aiPanelOpen
+              ? "bg-white/20 hover:bg-white/30"
+              : "hover:bg-white/10"
+          }`}
+          title="AI Assist"
         >
           {aiPanelOpen ? (
             <ActiveAIIcon />
@@ -80,36 +79,33 @@ export default function Header({
         </button>
 
         {/* Help */}
-        <button data-tip="Help & support" data-tip-pos="bottom" className="p-1.5 rounded hover:bg-white/10 transition-colors">
-          <Image src={asset("/icons/help.svg")} alt="Help" width={24} height={24} />
+        <button className="p-1.5 rounded hover:bg-white/10 transition-colors">
+          <Image src="/icons/help.svg" alt="Help" width={24} height={24} />
         </button>
 
         {/* Mentions */}
-        <button data-tip="Mentions" data-tip-pos="bottom" className="p-1.5 rounded hover:bg-white/10 transition-colors">
-          <Image src={asset("/icons/mentions.svg")} alt="Mentions" width={24} height={24} />
+        <button className="p-1.5 rounded hover:bg-white/10 transition-colors">
+          <Image src="/icons/mentions.svg" alt="Mentions" width={24} height={24} />
         </button>
 
         {/* Notifications */}
-        <button data-tip="Notifications" data-tip-pos="bottom" className="p-1.5 rounded hover:bg-white/10 transition-colors">
-          <Image src={asset("/icons/notifications.svg")} alt="Notifications" width={24} height={24} />
+        <button className="p-1.5 rounded hover:bg-white/10 transition-colors">
+          <Image src="/icons/notifications.svg" alt="Notifications" width={24} height={24} />
         </button>
 
         {/* Settings */}
         <div className="relative" ref={settingsRef}>
           <button
             onClick={() => setShowSettings(!showSettings)}
-            data-tip="Settings"
-            data-tip-pos="bottom"
             className="p-1.5 rounded hover:bg-white/10 transition-colors"
           >
-            <Image src={asset("/icons/settings.svg")} alt="Settings" width={24} height={24} />
+            <Image src="/icons/settings.svg" alt="Settings" width={24} height={24} />
           </button>
           {showSettings && (
             <SettingsDropdown
               onClose={() => setShowSettings(false)}
               onOpenCustomizeTabs={() => { setShowSettings(false); setShowCustomizeTabs(true); }}
               onOpenBranding={() => { setShowSettings(false); setShowBranding(true); }}
-              onOpenFaxSettings={() => { setShowSettings(false); setShowFaxSettings(true); }}
             />
           )}
         </div>
@@ -119,16 +115,11 @@ export default function Header({
         {showBranding && (
           <WhiteLabelDialog onClose={() => setShowBranding(false)} />
         )}
-        {showFaxSettings && (
-          <FaxSettingsDialog onClose={() => setShowFaxSettings(false)} />
-        )}
 
         {/* Profile Avatar */}
         <div className="relative" ref={profileRef}>
           <button
             onClick={() => setShowProfile(!showProfile)}
-            data-tip="Your profile"
-            data-tip-pos="bottom"
             className="relative w-9 h-9"
           >
             <div className="w-full h-full rounded-full overflow-hidden border-2 border-white/30 hover:border-white/60 transition-colors bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-sm font-semibold">

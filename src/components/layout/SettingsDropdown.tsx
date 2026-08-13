@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
 import IntegrationDialog from "./IntegrationDialog";
 
-export default function SettingsDropdown({ onClose: _onClose, onOpenCustomizeTabs, onOpenBranding, onOpenFaxSettings }: { onClose: () => void; onOpenCustomizeTabs?: () => void; onOpenBranding?: () => void; onOpenFaxSettings?: () => void }) {
+export default function SettingsDropdown({ onClose: _onClose, onOpenCustomizeTabs, onOpenBranding }: { onClose: () => void; onOpenCustomizeTabs?: () => void; onOpenBranding?: () => void }) {
   const { isDark, toggleTheme } = useTheme();
   const [volume, setVolume] = useState(65);
   const [showIntegration, setShowIntegration] = useState(false);
@@ -84,21 +84,6 @@ export default function SettingsDropdown({ onClose: _onClose, onOpenCustomizeTab
           <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
         </svg>
         <span className="text-sm" style={{ color: "var(--th-text-primary)" }}>Meet</span>
-      </button>
-
-      {/* Fax settings */}
-      <button
-        className="w-full flex items-center gap-3 px-4 py-3.5 transition-colors text-left"
-        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--th-bg-hover)"}
-        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
-        onClick={() => onOpenFaxSettings?.()}
-      >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--th-text-primary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-          <polyline points="6 9 6 2 18 2 18 9" />
-          <path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2" />
-          <rect x="6" y="14" width="12" height="8" />
-        </svg>
-        <span className="text-sm" style={{ color: "var(--th-text-primary)" }}>Fax settings</span>
       </button>
 
       {/* Color mode row */}

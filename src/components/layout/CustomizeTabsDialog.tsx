@@ -90,7 +90,7 @@ export default function CustomizeTabsDialog({ onClose }: { onClose: () => void }
           <button
             onClick={onClose}
             className="p-1.5 rounded-lg transition-colors hover:bg-[var(--th-bg-hover)]"
-            data-tip="Close"
+            title="Close"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--th-text-muted)" strokeWidth="2">
               <line x1="18" y1="6" x2="6" y2="18" />
@@ -156,7 +156,7 @@ export default function CustomizeTabsDialog({ onClose }: { onClose: () => void }
                     onClick={() => moveUp(index)}
                     disabled={index === 0}
                     className="p-1 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed enabled:hover:bg-[var(--th-bg-hover)]"
-                    data-tip="Move up"
+                    title="Move up"
                   >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--th-text-secondary)" strokeWidth="2">
                       <polyline points="18 15 12 9 6 15" />
@@ -166,7 +166,7 @@ export default function CustomizeTabsDialog({ onClose }: { onClose: () => void }
                     onClick={() => moveDown(index)}
                     disabled={index === items.length - 1}
                     className="p-1 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed enabled:hover:bg-[var(--th-bg-hover)]"
-                    data-tip="Move down"
+                    title="Move down"
                   >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--th-text-secondary)" strokeWidth="2">
                       <polyline points="6 9 12 15 18 9" />

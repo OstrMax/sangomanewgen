@@ -1,0 +1,19 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "teamhub-dev",
+      "runtimeExecutable": "/Users/maxostrozhinskiy/.nvm/versions/node/v24.13.1/bin/node",
+      "runtimeArgs": ["/Users/maxostrozhinskiy/teamhub/node_modules/.bin/next", "dev"],
+      "port": 3001,
+      "autoPort": true
+    },
+    {
+      "name": "figma-static",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["-y", "http-server", "figma", "-p", "4173", "-c-1", "--silent"],
+      "port": 4173,
+      "autoPort": true
+    }
+  ]
+}

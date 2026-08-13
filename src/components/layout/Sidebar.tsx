@@ -4,7 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
-import { asset } from "@/lib/asset";
 
 export type NavItem = {
   icon: string;
@@ -13,7 +12,6 @@ export type NavItem = {
   iconSize: number;
   extraPy?: boolean;
   badge?: boolean;
-  unread?: boolean;
 };
 
 export const defaultNavItems: NavItem[] = [
@@ -23,7 +21,7 @@ export const defaultNavItems: NavItem[] = [
   { icon: "/icons/operator-console.svg", label: "Operator\nconsole", href: "/operator", iconSize: 32, extraPy: true },
   { icon: "/icons/meet.svg", label: "Meet", href: "/meet", iconSize: 24 },
   { icon: "/icons/sms.svg", label: "SMS", href: "/sms", iconSize: 24 },
-  { icon: "/icons/fax.svg", label: "Fax", href: "/fax", iconSize: 24, unread: true },
+  { icon: "/icons/fax.svg", label: "Fax", href: "/fax", iconSize: 24 },
   { icon: "/icons/calendar.svg", label: "Calendar", href: "/calendar", iconSize: 24 },
   { icon: "/icons/files.svg", label: "Files", href: "/files", iconSize: 24 },
   { icon: "/icons/contact-center.svg", label: "CX", href: "/contact-center", iconSize: 24, badge: true },
@@ -82,7 +80,7 @@ export default function Sidebar() {
     <div className="flex flex-col items-center gap-1 w-16 h-full pb-2 shrink-0">
       {/* Logo */}
       <Link href="/" className="flex items-center justify-center w-full h-12 pt-4 pb-3.5 overflow-hidden">
-        <Image src={asset("/icons/logo.png")} alt="TeamHub" width={36} height={24} priority />
+        <Image src="/icons/logo.png" alt="TeamHub" width={36} height={24} priority />
       </Link>
 
       {navItems.map((item) => {
@@ -92,40 +90,32 @@ export default function Sidebar() {
           <Link
             key={item.href}
             href={item.href}
-            data-active={isActive ? "true" : "false"}
-            aria-current={isActive ? "page" : undefined}
-            className={`sidebar-tab group flex flex-col items-center justify-center gap-1 w-14 rounded-xl relative no-underline ${
+            className={`flex flex-col items-center justify-center gap-1 w-14 rounded-lg relative no-underline transition-colors ${
               extraPy ? "py-1.5 my-1" : "h-14"
+            } ${
+              !isActive ? "hover:bg-white/10" : ""
             }`}
+            style={isActive ? { backgroundColor: "var(--th-sidebar-active)" } : undefined}
           >
-            {/* Glass surface — shows on hover & active */}
-            <span
-              aria-hidden="true"
-              className="sidebar-tab__surface absolute inset-0 rounded-xl pointer-events-none"
-            />
             <Image
-              src={asset(item.icon)}
+              src={item.icon}
               alt={item.label}
               width={item.iconSize}
               height={item.iconSize}
-              className="sidebar-tab__icon shrink-0 relative z-10"
+              className={`shrink-0 transition-opacity ${isActive ? "opacity-100" : "opacity-70"}`}
             />
             <span
-              className={`sidebar-tab__label relative z-10 text-[10px] leading-3 text-center tracking-[0.4px] whitespace-pre-wrap w-[46px] font-[family-name:var(--font-manrope)] ${
-                isActive ? "text-white font-semibold" : "text-white/70 font-medium"
+              className={`text-[10px] leading-3 text-center tracking-[0.4px] whitespace-pre-wrap w-[46px] font-[family-name:var(--font-manrope)] transition-all ${
+                isActive
+                  ? "text-white font-semibold"
+                  : "text-white/70 font-medium"
               }`}
             >
               {item.label}
             </span>
             {item.badge && (
               <span
-                className="absolute top-[6px] right-[10px] w-2.5 h-2.5 bg-[#fcc624] rounded-full z-20"
-                style={{ border: "2px solid var(--th-sidebar-badge-border)" }}
-              />
-            )}
-            {item.unread && (
-              <span
-                className="absolute top-[6px] right-[10px] w-2.5 h-2.5 bg-[#fcc624] rounded-full z-20"
+                className="absolute top-[6px] right-[10px] w-2.5 h-2.5 bg-[#fcc624] rounded-full"
                 style={{ border: "2px solid var(--th-sidebar-badge-border)" }}
               />
             )}

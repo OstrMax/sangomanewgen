@@ -7,7 +7,6 @@ import Header from "./Header";
 import AIAssistPanel from "@/components/ai/AIAssistPanel";
 import WalkthroughBubbles from "@/components/walkthrough/WalkthroughBubbles";
 import { useWhiteLabel } from "@/contexts/WhiteLabelContext";
-import { asset } from "@/lib/asset";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [aiPanelOpen, setAiPanelOpen] = useState(false);
@@ -26,7 +25,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       >
         <div className="flex items-center gap-2">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={asset("/icons/logo.png")} alt={config.appName} width={20} height={14} />
+          <img src="/icons/logo.png" alt={config.appName} width={20} height={14} />
           <span className="text-white/90 font-normal text-[15px] tracking-[0.3px] font-[family-name:var(--font-inter)]">{config.appName}</span>
         </div>
       </div>
@@ -55,8 +54,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </div>
       </div>
 
-      {/* Walkthrough tooltips (fax has its own contextual tour) */}
-      {!pathname.startsWith("/fax") && <WalkthroughBubbles />}
+      {/* Walkthrough tooltips */}
+      <WalkthroughBubbles />
     </div>
   );
 }

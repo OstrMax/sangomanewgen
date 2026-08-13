@@ -208,7 +208,7 @@ export default function CalendarPage() {
             <button onClick={handlePrevDay} className="p-1.5 rounded-lg hover:bg-[var(--th-bg-hover)] active:scale-90 transition-all">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 4L6 8l4 4" stroke="var(--th-text-primary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </button>
-            <button onClick={handleToday} className="p-1.5 rounded-lg hover:bg-[var(--th-bg-hover)] active:scale-90 transition-all" data-tip="Today">
+            <button onClick={handleToday} className="p-1.5 rounded-lg hover:bg-[var(--th-bg-hover)] active:scale-90 transition-all" title="Today">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                 <rect x="2" y="2" width="12" height="12" rx="2" stroke="var(--th-text-primary)" strokeWidth="1.3"/>
                 <path d="M2 6h12" stroke="var(--th-text-primary)" strokeWidth="1.3"/>

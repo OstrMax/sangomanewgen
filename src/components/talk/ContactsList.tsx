@@ -73,7 +73,7 @@ export default function ContactsList() {
               </button>
             ))}
           </div>
-          <button className="text-xs font-semibold tracking-wider hover:opacity-80" data-tip="Add new contact" style={{ color: 'var(--th-tab-active)' }}>
+          <button className="text-xs font-semibold tracking-wider hover:opacity-80" title="Add new contact" style={{ color: 'var(--th-tab-active)' }}>
             + ADD CONTACT
           </button>
         </div>
@@ -148,7 +148,7 @@ export default function ContactsList() {
               <button
                 onClick={(e) => { e.stopPropagation(); setCallingContact(contact); }}
                 className="p-1.5 rounded transition-colors active:scale-90"
-                data-tip="Make a call"
+                title="Make a call"
                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--th-bg-hover)'}
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               >
@@ -158,7 +158,7 @@ export default function ContactsList() {
               {/* More */}
               <button
                 className="p-1 rounded transition-colors opacity-0 group-hover:opacity-100"
-                data-tip="More options"
+                title="More options"
                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--th-bg-hover)'}
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               >

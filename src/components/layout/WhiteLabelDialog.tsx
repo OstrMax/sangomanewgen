@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useWhiteLabel, DEFAULT_WHITE_LABEL, type SidebarStyle } from "@/contexts/WhiteLabelContext";
-import { asset } from "@/lib/asset";
 
 interface Preset {
   name: string;
@@ -68,7 +67,7 @@ export default function WhiteLabelDialog({ onClose }: { onClose: () => void }) {
             <h2 className="text-lg font-semibold" style={{ color: "var(--th-text-primary)" }}>Branding & theme</h2>
             <p className="text-[12px] mt-0.5" style={{ color: "var(--th-text-muted)" }}>White-label the app — changes apply live</p>
           </div>
-          <button onClick={handleCancel} className="btn-icon p-1.5 rounded-lg" data-tip="Close">
+          <button onClick={handleCancel} className="btn-icon p-1.5 rounded-lg" title="Close">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--th-text-muted)" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
           </button>
         </div>
@@ -173,7 +172,7 @@ export default function WhiteLabelDialog({ onClose }: { onClose: () => void }) {
               {/* Mock topbar */}
               <div className="h-9 flex items-center justify-center gap-2" style={{ backgroundColor: draft.brandColor }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={asset("/icons/logo.png")} alt="" width={16} height={11} style={{ objectFit: "contain" }} />
+                <img src="/icons/logo.png" alt="" width={16} height={11} style={{ objectFit: "contain" }} />
                 <span className="text-white/90 text-[12px] font-normal tracking-[0.3px]">{draft.appName}</span>
               </div>
               {/* Mock body */}

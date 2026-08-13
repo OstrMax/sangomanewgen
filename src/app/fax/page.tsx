@@ -782,57 +782,43 @@ function RecipientInput({ chips, onAdd, onRemove, value, onValueChange }: { chip
 
 /* ── Compose (2-step) ── */
 /* ── Shared cover-sheet step (used by Compose & Forward) ── */
-function CoverSheetStep({
-  coverTab, setCoverTab, from, setFrom, chips, setChips, subject, setSubject, message, setMessage, template, setTemplate, onNotify,
+function CoverFields({
+  coverTab, setCoverTab, subject, setSubject, message, setMessage, template, setTemplate, from, to, onNotify,
 }: {
   coverTab: "default" | "custom";
   setCoverTab: (v: "default" | "custom") => void;
-  from: string; setFrom: (v: string) => void;
-  chips: string[]; setChips: (v: string[]) => void;
   subject: string; setSubject: (v: string) => void;
   message: string; setMessage: (v: string) => void;
   template: string; setTemplate: (v: string) => void;
+  from: string; to: string;
   onNotify?: (title: string, sub: string) => void;
 }) {
   const [showPreview, setShowPreview] = useState(false);
-  const [tplList, setTplList] = useState(["Cover for legal", "Cover for medical", "Cover for vendors"]);
+  const [tplList, setTplList] = useState(["Cover for legal", "Cover for medical"]);
   const [tplOpen, setTplOpen] = useState(false);
-  const [editing, setEditing] = useState(false);
-  const [editingOrig, setEditingOrig] = useState("");
   const [tplName, setTplName] = useState(template);
   const [attention, setAttention] = useState("Legal Team");
   const [footerName, setFooterName] = useState<string | null>(null);
-  const [recipInput, setRecipInput] = useState("");
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 pt-1">
       {/* Tabs */}
       <div className="flex items-center gap-6 border-b" style={{ borderColor: "var(--th-border)" }}>
         {([["default", "Default cover"], ["custom", "Custom template"]] as const).map(([id, label]) => (
           <button key={id} onClick={() => setCoverTab(id)} className="pb-2.5 text-[14px] font-semibold transition-colors relative" style={{ color: coverTab === id ? "var(--th-text-primary)" : "var(--th-text-muted)" }}>
             {label}
-            {coverTab === id && <div className="absolute bottom-0 left-0 right-0 h-[2px]" style={{ backgroundColor: "var(--th-fax-cta-bg)" }} />}
+            {coverTab === id && <div className="absolute bottom-0 left-0 right-0 h-[2px]" style={{ backgroundColor: "#142B53" }} />}
           </button>
         ))}
       </div>
 
       {coverTab === "default" && (
         <>
-          <div className="flex items-start gap-3 p-4 rounded-xl" style={{ backgroundColor: "rgba(122,90,248,0.08)" }}>
-            <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: "#7A5AF8" }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.6"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
-            </div>
-            <div>
-              <div className="text-[13px] font-bold" style={{ color: "var(--th-text-primary)" }}>Sangoma standard cover page</div>
-              <div className="text-[12px] mt-0.5" style={{ color: "var(--th-text-secondary)" }}>A clean built-in cover sheet is generated automatically — no header or footer image needed.</div>
-            </div>
-          </div>
-          <div><FieldLabel hint="(personal fax number)">From</FieldLabel><Select value={from} onChange={setFrom} options={senderNumbers} /></div>
-          <div><FieldLabel required>Recipients</FieldLabel><RecipientInput chips={chips} onAdd={(v) => setChips([...chips, v])} onRemove={(i) => setChips(chips.filter((_, j) => j !== i))} value={recipInput} onValueChange={setRecipInput} /></div>
-          <div><FieldLabel>Subject</FieldLabel><input value={subject} onChange={(e) => setSubject(e.target.value)} className="w-full px-4 py-2.5 rounded-xl text-[14px] outline-none" style={inputStyle} /></div>
-          <div><FieldLabel hint="(Optional)">Message</FieldLabel><textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={3} className="w-full px-4 py-2.5 rounded-xl text-[14px] outline-none resize-none" style={inputStyle} /></div>
+          <div><FieldLabel>Attention</FieldLabel><input value={attention} onChange={(e) => setAttention(e.target.value)} placeholder="Recipient name or department" className="w-full px-4 py-2.5 rounded-xl text-[14px] outline-none placeholder:text-[#9AA3AB]" style={inputStyle} /></div>
+          <div><FieldLabel>Subject</FieldLabel><input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Subject of this fax" className="w-full px-4 py-2.5 rounded-xl text-[14px] outline-none placeholder:text-[#9AA3AB]" style={inputStyle} /></div>
+          <div><FieldLabel>Message</FieldLabel><textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={3} placeholder="Write a short message for the cover sheet…" className="w-full px-4 py-2.5 rounded-xl text-[14px] outline-none resize-none placeholder:text-[#9AA3AB]" style={inputStyle} /></div>
         </>
       )}
-      {coverTab === "custom" && !editing && (
+      {coverTab === "custom" && (
         <>
           <div>
             <FieldLabel hint="(choose one)">Template</FieldLabel>
@@ -847,8 +833,8 @@ function CoverSheetStep({
                   <div className="absolute left-0 right-0 top-12 z-50 rounded-xl py-1.5 modal-enter" style={{ backgroundColor: "var(--th-bg-card)", boxShadow: "0 12px 32px rgba(0,0,0,0.18)", border: "1px solid var(--th-border)" }}>
                     {tplList.map((t) => (
                       <div key={t} className="flex items-center px-3.5 py-2 transition-colors" onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "var(--th-bg-hover)")} onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}>
-                        <button onClick={() => { setTemplate(t); setTplOpen(false); }} className="flex-1 text-left text-[13px] font-medium" style={{ color: "var(--th-text-primary)" }}>{t}</button>
-                        <button onClick={() => { setEditingOrig(t); setTplName(t); setTplOpen(false); setEditing(true); }} className="flex items-center gap-1 text-[12px] font-semibold" style={{ color: "var(--th-tab-active)" }}>
+                        <button onClick={() => { setTemplate(t); setTplName(t); setTplOpen(false); }} className="flex-1 text-left text-[13px] font-medium" style={{ color: "var(--th-text-primary)" }}>{t}</button>
+                        <button onClick={() => { setTemplate(t); setTplName(t); setTplOpen(false); }} className="flex items-center gap-1 text-[12px] font-semibold" style={{ color: "#142B53" }}>
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M12 20h9" /><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4L16.5 3.5z" /></svg>
                           Edit
                         </button>
@@ -859,25 +845,13 @@ function CoverSheetStep({
               )}
             </div>
           </div>
-          <button onClick={() => setShowPreview(true)} className="w-full py-3 rounded-xl flex items-center justify-center gap-2 text-[13px] font-semibold transition-colors hover:opacity-90" style={{ backgroundColor: "var(--th-bg-hover)", color: "var(--th-text-primary)" }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
-            Preview cover sheet
-          </button>
-        </>
-      )}
-      {coverTab === "custom" && editing && (
-        <div className="space-y-4">
-          <button onClick={() => setEditing(false)} className="flex items-center gap-1.5 text-[13px] font-medium" style={{ color: "var(--th-text-secondary)" }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" /></svg>
-            Back to templates
-          </button>
           <div><FieldLabel>Template name</FieldLabel><input value={tplName} onChange={(e) => setTplName(e.target.value)} className="w-full px-4 py-2.5 rounded-xl text-[14px] outline-none" style={inputStyle} /></div>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <FieldLabel>Header image</FieldLabel>
-              <div className="h-[72px] rounded-xl flex flex-col items-center justify-center gap-1" style={{ backgroundColor: "var(--th-bg-hover)" }}>
-                <span className="text-[13px] font-black tracking-tight" style={{ color: "var(--th-text-primary)" }}>SANGOMA</span>
-                <button className="flex items-center gap-1 text-[11px] font-semibold" style={{ color: "var(--th-text-secondary)" }}>
+              <div className="h-20 rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-1.5" style={{ borderColor: "var(--th-border)", backgroundColor: "var(--th-bg-hover)" }}>
+                <span className="px-1.5 py-1 rounded text-[9px] font-bold text-white" style={{ backgroundColor: "#595959" }}>SANGOMA</span>
+                <button className="flex items-center gap-1 text-[11px] font-semibold" style={{ color: "var(--th-text-primary)" }}>
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="23 4 23 10 17 10" /><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10" /></svg>
                   Replace
                 </button>
@@ -885,30 +859,29 @@ function CoverSheetStep({
             </div>
             <div>
               <FieldLabel hint="(PNG/JPG)">Footer image</FieldLabel>
-              <button onClick={() => setFooterName("footer_1500x500.png")} className="w-full h-[72px] rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-1 transition-colors" style={{ borderColor: "var(--th-border)", backgroundColor: "var(--th-bg)" }}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--th-text-muted)" strokeWidth="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
+              <button onClick={() => setFooterName("footer_1500x500.png")} className="w-full h-20 rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-1 transition-colors" style={{ borderColor: "var(--th-border)", backgroundColor: "var(--th-bg)" }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--th-text-muted)" strokeWidth="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
                 <span className="text-[11px] truncate max-w-[130px]" style={{ color: "var(--th-text-muted)" }}>{footerName ?? "Click to upload"}</span>
               </button>
             </div>
           </div>
-          <p className="text-[11px] leading-relaxed" style={{ color: "var(--th-text-muted)" }}><span className="font-bold" style={{ color: "var(--th-text-secondary)" }}>Please note:</span> Header and footer images must be 1500px × 500px max, PNG/JPG only.</p>
+          <p className="text-[13px] leading-relaxed" style={{ color: "var(--th-text-primary)" }}><span className="font-semibold">Please note: </span><span style={{ color: "var(--th-text-secondary)" }}>(Header and footer images must be 1500px x 500px max, PNG/JPG only)</span></p>
           <div><FieldLabel>Attention</FieldLabel><input value={attention} onChange={(e) => setAttention(e.target.value)} className="w-full px-4 py-2.5 rounded-xl text-[14px] outline-none" style={inputStyle} /></div>
           <div><FieldLabel>Subject</FieldLabel><input value={subject} onChange={(e) => setSubject(e.target.value)} className="w-full px-4 py-2.5 rounded-xl text-[14px] outline-none" style={inputStyle} /></div>
-          <div><FieldLabel hint="(Optional)">Message</FieldLabel><textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={3} className="w-full px-4 py-2.5 rounded-xl text-[14px] outline-none resize-none" style={inputStyle} /></div>
-          <button onClick={() => setShowPreview(true)} className="w-full py-3 rounded-xl flex items-center justify-center gap-2 text-[13px] font-semibold transition-colors hover:opacity-90" style={{ backgroundColor: "var(--th-bg-hover)", color: "var(--th-text-primary)" }}>
+          <button onClick={() => setShowPreview(true)} className="w-full py-3 rounded-xl border border-dashed flex items-center justify-center gap-2 text-[13px] font-semibold transition-colors hover:opacity-90" style={{ borderColor: "var(--th-border)", backgroundColor: "var(--th-bg-hover)", color: "var(--th-text-primary)" }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
             Preview cover sheet
           </button>
-          <button onClick={() => { const name = tplName.trim() || editingOrig; setTplList((list) => list.map((x) => (x === editingOrig ? name : x))); setTemplate(name); setEditing(false); onNotify?.("Template saved", name); }} className="w-full py-3 rounded-xl flex items-center justify-center gap-2 text-[13px] font-bold uppercase tracking-wider" style={{ backgroundColor: "var(--th-fax-cta-bg)", color: "var(--th-fax-cta-text)" }}>
+          <button onClick={() => { const name = tplName.trim() || template; setTplList((list) => list.map((x) => (x === template ? name : x))); setTemplate(name); onNotify?.("Template saved", name); }} className="w-full py-3 rounded-xl border border-dashed flex items-center justify-center gap-2 text-[13px] font-semibold transition-colors hover:opacity-90" style={{ borderColor: "var(--th-border)", backgroundColor: "var(--th-bg-hover)", color: "var(--th-text-primary)" }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" /><polyline points="17 21 17 13 7 13 7 21" /><polyline points="7 3 7 8 15 8" /></svg>
             Save
           </button>
-        </div>
+        </>
       )}
       {showPreview && (
         <CoverSheetPreview
           from={from}
-          to={chips[0] ?? "—"}
+          to={to}
           subject={subject}
           message={message}
           onBack={() => setShowPreview(false)}
@@ -986,102 +959,129 @@ function Row({ k, v }: { k: string; v: string }) {
 }
 
 function ComposeFaxDialog({ onClose, onSent, onNotify }: { onClose: () => void; onSent: (a: string, b: string) => void; onNotify?: (title: string, sub: string) => void }) {
-  const [step, setStep] = useState<1 | 2>(1);
   const [from, setFrom] = useState(senderNumbers[0]);
   const [chips, setChips] = useState<string[]>([]);
   const [recipInput, setRecipInput] = useState("");
-  const [includeCover, setIncludeCover] = useState(true);
+  const [includeCover, setIncludeCover] = useState(false);
   const [coverOnly, setCoverOnly] = useState(false);
-  const [files, setFiles] = useState<{ name: string; size: string }[]>([{ name: "NDA_signed_final.pdf", size: "1.2 MB" }]);
+  const [files, setFiles] = useState<{ name: string; size: string }[]>([]);
   const [coverTab, setCoverTab] = useState<"default" | "custom">("default");
   const [subject, setSubject] = useState("Signed NDA — Q2 kickoff");
   const [message, setMessage] = useState("Please find the signed NDA attached. Reach out with any questions before Friday's kickoff.");
   const [template, setTemplate] = useState("Cover for legal");
 
-  const goNext = () => {
+  // Cover-only forces the cover sheet on.
+  const includeOn = includeCover || coverOnly;
+  const hasRecipient = chips.length > 0 || recipInput.trim().length > 0;
+  // A fax must carry something: an attachment, or a cover sheet.
+  const canSend = hasRecipient && (coverOnly || files.length > 0 || includeOn);
+  const send = () => {
     const pending = recipInput.trim();
     const list = pending ? [...chips, pending] : chips;
     if (pending) { setChips(list); setRecipInput(""); }
     if (list.length === 0) return;
-    if (coverOnly || includeCover) setStep(2);
-    else onSent(subject, `${list[0] ?? "Recipient"} · ${files.length} file(s)`);
+    onSent(subject, includeOn ? `${list[0] ?? "Recipient"} · ${subject}` : `${list[0] ?? "Recipient"} · ${files.length} file(s)`);
   };
 
   return (
     <DialogShell onClose={onClose} width={560}>
-      <DialogHeader title={step === 1 ? "New fax. Recipients & attachment" : "New fax. Cover sheet"} onClose={onClose} />
+      <DialogHeader title="New fax. Recipients & cover sheet" onClose={onClose} />
       <div className="px-6 py-5 overflow-y-auto flex-1">
-        {step === 1 ? (
-          <div className="space-y-5">
-            <div>
-              <FieldLabel hint="(personal fax number)">From</FieldLabel>
-              <Select value={from} onChange={setFrom} options={senderNumbers} />
-            </div>
-            <div>
-              <FieldLabel required>Recipients</FieldLabel>
-              <RecipientInput chips={chips} onAdd={(v) => setChips([...chips, v])} onRemove={(i) => setChips(chips.filter((_, j) => j !== i))} value={recipInput} onValueChange={setRecipInput} />
-            </div>
-            <ToggleRow label="Include a cover sheet" on={includeCover} onToggle={() => { setIncludeCover(!includeCover); if (!includeCover) setCoverOnly(false); }} />
-            <ToggleRow label="Send a cover sheet only" on={coverOnly} onToggle={() => { setCoverOnly(!coverOnly); if (!coverOnly) setIncludeCover(false); }} />
-            {!coverOnly && (
-              <div>
-                <FieldLabel hint="· PDF, JPG, PNG, TIFF · max 20 MB">Attachments</FieldLabel>
-                {files.length === 0 ? (
-                  <button onClick={() => setFiles([{ name: "Document.pdf", size: "0.8 MB" }])} className="w-full py-7 rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-1.5 transition-colors" style={{ borderColor: "var(--th-border)", backgroundColor: "var(--th-bg)" }}>
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--th-text-muted)" strokeWidth="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
-                    <div className="text-[13px] font-semibold" style={{ color: "var(--th-text-primary)" }}>Click to upload or drag a file</div>
-                    <div className="text-[11px]" style={{ color: "var(--th-text-muted)" }}>One file per fax</div>
-                  </button>
-                ) : (
-                  <div className="space-y-1.5">
-                    {files.map((f, i) => (
-                      <div key={i} className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-[12px]" style={{ backgroundColor: "var(--th-bg-hover)" }}>
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--th-text-muted)" strokeWidth="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
-                        <span className="flex-1 truncate font-medium" style={{ color: "var(--th-text-primary)" }}>{f.name}</span>
-                        <span style={{ color: "var(--th-text-muted)" }}>{f.size}</span>
-                        <button onClick={() => setFiles(files.filter((_, j) => j !== i))} className="text-[#EF4444]" data-tip="Remove file">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
+        <div className="space-y-5">
+          <div>
+            <FieldLabel hint="(personal fax number)">From</FieldLabel>
+            <Select value={from} onChange={setFrom} options={senderNumbers} />
           </div>
-        ) : (
-          <CoverSheetStep
-            coverTab={coverTab} setCoverTab={setCoverTab}
-            from={from} setFrom={setFrom}
-            chips={chips} setChips={setChips}
-            subject={subject} setSubject={setSubject}
-            message={message} setMessage={setMessage}
-            template={template} setTemplate={setTemplate}
-            onNotify={onNotify}
+          <div>
+            <FieldLabel required>Recipients</FieldLabel>
+            <RecipientInput chips={chips} onAdd={(v) => setChips([...chips, v])} onRemove={(i) => setChips(chips.filter((_, j) => j !== i))} value={recipInput} onValueChange={setRecipInput} />
+          </div>
+          {!coverOnly && (
+            <div>
+              <FieldLabel hint="· PDF, JPG, PNG, TIFF · max 20 MB">Attachments</FieldLabel>
+              {files.length === 0 ? (
+                <button onClick={() => setFiles([{ name: "Document.pdf", size: "0.8 MB" }])} className="w-full py-7 rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-1.5 transition-colors" style={{ borderColor: "var(--th-border)", backgroundColor: "var(--th-bg)" }}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--th-text-muted)" strokeWidth="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
+                  <div className="text-[13px] font-semibold" style={{ color: "var(--th-text-primary)" }}>Click to upload or drag a file</div>
+                  <div className="text-[11px]" style={{ color: "var(--th-text-muted)" }}>One file per fax</div>
+                </button>
+              ) : (
+                <div className="space-y-1.5">
+                  {files.map((f, i) => (
+                    <div key={i} className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-[12px]" style={{ backgroundColor: "var(--th-bg-hover)" }}>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--th-text-muted)" strokeWidth="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
+                      <span className="flex-1 truncate font-medium" style={{ color: "var(--th-text-primary)" }}>{f.name}</span>
+                      <span style={{ color: "var(--th-text-muted)" }}>{f.size}</span>
+                      <button onClick={() => setFiles(files.filter((_, j) => j !== i))} className="text-[#EF4444]" data-tip="Remove file">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+          <Checkbox
+            label="Send a cover sheet only"
+            checked={coverOnly}
+            onToggle={() => { const next = !coverOnly; setCoverOnly(next); if (next) setIncludeCover(true); }}
           />
-        )}
-      </div>
-      <div className="flex items-center justify-between px-6 py-4 border-t shrink-0" style={{ borderColor: "var(--th-border)" }}>
-        <span className="text-[12px]" style={{ color: "var(--th-text-muted)" }}>Step {step} of 2</span>
-        <div className="flex items-center gap-4">
-          <button onClick={step === 2 ? () => setStep(1) : onClose} className="text-[13px] font-bold uppercase tracking-wider" style={{ color: "var(--th-text-secondary)" }}>{step === 2 ? "Back" : "Cancel"}</button>
-          {step === 1 ? (
-            <button onClick={goNext} disabled={chips.length === 0 && !recipInput.trim()} className="btn-primary px-5 py-2.5 rounded-xl text-[13px] font-bold uppercase tracking-wider disabled:opacity-40 disabled:cursor-not-allowed" style={{ backgroundColor: "var(--th-fax-cta-bg)", color: "var(--th-fax-cta-text)" }}>{includeCover || coverOnly ? "Next: Cover sheet" : "Send fax"}</button>
-          ) : (
-            <button onClick={() => onSent(subject, `${chips[0] ?? "Recipient"} · ${subject}`)} disabled={chips.length === 0} className="btn-primary px-6 py-2.5 rounded-xl text-[13px] font-bold uppercase tracking-wider disabled:opacity-40 disabled:cursor-not-allowed" style={{ backgroundColor: "var(--th-fax-cta-bg)", color: "var(--th-fax-cta-text)" }}>Send fax</button>
+          <div className="pt-1 border-t" style={{ borderColor: "var(--th-border)" }}>
+            <div className="flex items-center justify-between pt-4">
+              <div className="flex items-center gap-1.5">
+                <span className="text-[14px] font-semibold" style={{ color: "var(--th-text-primary)" }}>Include a cover sheet</span>
+                <HelpIcon tip="A cover sheet adds a title page with sender, recipient, subject and message." />
+              </div>
+              <Toggle
+                on={includeOn}
+                onToggle={() => { if (coverOnly) return; setIncludeCover(!includeCover); }}
+              />
+            </div>
+          </div>
+          {includeOn && (
+            <CoverFields
+              coverTab={coverTab} setCoverTab={setCoverTab}
+              subject={subject} setSubject={setSubject}
+              message={message} setMessage={setMessage}
+              template={template} setTemplate={setTemplate}
+              from={from} to={chips[0] || recipInput.trim() || "—"}
+              onNotify={onNotify}
+            />
           )}
         </div>
+      </div>
+      <div className="flex items-center justify-end gap-4 px-6 py-4 border-t shrink-0" style={{ borderColor: "var(--th-border)" }}>
+        <button onClick={onClose} className="text-[13px] font-bold uppercase tracking-wider" style={{ color: "var(--th-text-secondary)" }}>Cancel</button>
+        <button onClick={send} disabled={!canSend} className="btn-primary px-6 py-2.5 rounded-xl text-[13px] font-bold uppercase tracking-wider disabled:opacity-40 disabled:cursor-not-allowed" style={{ backgroundColor: "var(--th-fax-cta-bg)", color: "var(--th-fax-cta-text)" }}>Send fax</button>
       </div>
     </DialogShell>
   );
 }
 
-function ToggleRow({ label, on, onToggle }: { label: string; on: boolean; onToggle: () => void }) {
+function Checkbox({ label, checked, onToggle }: { label: string; checked: boolean; onToggle: () => void }) {
   return (
-    <div className="flex items-center justify-between">
+    <button onClick={onToggle} className="flex items-center gap-2.5 group">
+      <span
+        className="w-[18px] h-[18px] rounded-[5px] border flex items-center justify-center shrink-0 transition-colors"
+        style={{
+          borderColor: checked ? "#142B53" : "var(--th-border)",
+          backgroundColor: checked ? "#142B53" : "var(--th-bg)",
+        }}
+      >
+        {checked && (
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
+        )}
+      </span>
       <span className="text-[14px] font-semibold" style={{ color: "var(--th-text-primary)" }}>{label}</span>
-      <Toggle on={on} onToggle={onToggle} />
-    </div>
+    </button>
+  );
+}
+
+function HelpIcon({ tip }: { tip: string }) {
+  return (
+    <span data-tip={tip} className="inline-flex items-center justify-center w-4 h-4 rounded-full cursor-help" style={{ backgroundColor: "var(--th-bg-hover)" }}>
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--th-text-muted)" strokeWidth="2.2"><path d="M9.5 9a2.5 2.5 0 015 0c0 1.5-2.5 2-2.5 3.5" /><line x1="12" y1="17" x2="12" y2="17" /></svg>
+    </span>
   );
 }
 
@@ -1098,7 +1098,6 @@ function Select({ value, onChange, options }: { value: string; onChange: (v: str
 
 /* ── Forward ── */
 function ForwardFaxDialog({ fax, onClose, onForward, onNotify }: { fax: FaxItem; onClose: () => void; onForward: () => void; onNotify?: (title: string, sub: string) => void }) {
-  const [step, setStep] = useState<1 | 2>(1);
   const [from, setFrom] = useState(senderNumbers[0]);
   const [chips, setChips] = useState<string[]>([]);
   const [recipInput, setRecipInput] = useState("");
@@ -1108,58 +1107,56 @@ function ForwardFaxDialog({ fax, onClose, onForward, onNotify }: { fax: FaxItem;
   const [subject, setSubject] = useState(fax.subject);
   const [template, setTemplate] = useState("Cover for legal");
 
-  const goNext = () => {
+  const forward = () => {
     const pending = recipInput.trim();
     const list = pending ? [...chips, pending] : chips;
     if (pending) { setChips(list); setRecipInput(""); }
     if (list.length === 0) return;
-    if (cover) setStep(2);
-    else onForward();
+    onForward();
   };
 
   return (
     <DialogShell onClose={onClose} width={560}>
-      <DialogHeader title={step === 1 ? "Forward fax" : "Forward fax. Cover sheet"} onClose={onClose} />
+      <DialogHeader title="Forward fax" onClose={onClose} />
       <div className="px-6 py-5 overflow-y-auto flex-1">
-        {step === 1 ? (
-          <div className="space-y-5">
-            <div><FieldLabel hint="(personal fax number)">From</FieldLabel><Select value={from} onChange={setFrom} options={senderNumbers} /></div>
-            <div><FieldLabel required>Recipients</FieldLabel><RecipientInput chips={chips} onAdd={(v) => setChips([...chips, v])} onRemove={(i) => setChips(chips.filter((_, j) => j !== i))} value={recipInput} onValueChange={setRecipInput} /></div>
-            <ToggleRow label="Include a cover sheet" on={cover} onToggle={() => setCover(!cover)} />
-            <div>
-              <FieldLabel hint="(original fax)">Forwarding</FieldLabel>
-              <div className="flex items-center gap-3 p-3.5 rounded-xl" style={{ backgroundColor: "rgba(122,90,248,0.06)", border: "1px solid var(--th-border)" }}>
-                <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: "var(--th-bg-hover)" }}><PrinterIcon /></div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-[13px] font-bold truncate" style={{ color: "var(--th-text-primary)" }}>{fax.subject}</div>
-                  <div className="text-[12px]" style={{ color: "var(--th-text-muted)" }}>From: {fax.number}</div>
-                </div>
-                <span className="px-2.5 py-1 rounded-md text-[11px] font-bold shrink-0" style={{ backgroundColor: "rgba(122,90,248,0.12)", color: "#7A5AF8" }}>{fax.pages} pages</span>
+        <div className="space-y-5">
+          <div><FieldLabel hint="(personal fax number)">From</FieldLabel><Select value={from} onChange={setFrom} options={senderNumbers} /></div>
+          <div><FieldLabel required>Recipients</FieldLabel><RecipientInput chips={chips} onAdd={(v) => setChips([...chips, v])} onRemove={(i) => setChips(chips.filter((_, j) => j !== i))} value={recipInput} onValueChange={setRecipInput} /></div>
+          <div className="pt-1 border-t" style={{ borderColor: "var(--th-border)" }}>
+            <div className="flex items-center justify-between pt-4">
+              <div className="flex items-center gap-1.5">
+                <span className="text-[14px] font-semibold" style={{ color: "var(--th-text-primary)" }}>Include a cover sheet</span>
+                <HelpIcon tip="A cover sheet adds a title page with sender, recipient, subject and message." />
               </div>
+              <Toggle on={cover} onToggle={() => setCover(!cover)} />
             </div>
           </div>
-        ) : (
-          <CoverSheetStep
-            coverTab={coverTab} setCoverTab={setCoverTab}
-            from={from} setFrom={setFrom}
-            chips={chips} setChips={setChips}
-            subject={subject} setSubject={setSubject}
-            message={message} setMessage={setMessage}
-            template={template} setTemplate={setTemplate}
-            onNotify={onNotify}
-          />
-        )}
-      </div>
-      <div className="flex items-center justify-between px-6 py-4 border-t shrink-0" style={{ borderColor: "var(--th-border)" }}>
-        <span className="text-[12px]" style={{ color: "var(--th-text-muted)" }}>{cover ? `Step ${step} of 2` : ""}</span>
-        <div className="flex items-center gap-4">
-          <button onClick={step === 2 ? () => setStep(1) : onClose} className="text-[13px] font-bold uppercase tracking-wider" style={{ color: "var(--th-text-secondary)" }}>{step === 2 ? "Back" : "Cancel"}</button>
-          {step === 1 ? (
-            <button onClick={goNext} disabled={chips.length === 0 && !recipInput.trim()} className="btn-primary px-6 py-2.5 rounded-xl text-[13px] font-bold uppercase tracking-wider disabled:opacity-40 disabled:cursor-not-allowed" style={{ backgroundColor: "var(--th-fax-cta-bg)", color: "var(--th-fax-cta-text)" }}>{cover ? "Next: Cover sheet" : "Forward"}</button>
-          ) : (
-            <button onClick={onForward} className="btn-primary px-6 py-2.5 rounded-xl text-[13px] font-bold uppercase tracking-wider" style={{ backgroundColor: "var(--th-fax-cta-bg)", color: "var(--th-fax-cta-text)" }}>Forward</button>
+          <div>
+            <FieldLabel hint="(original fax)">Forwarding</FieldLabel>
+            <div className="flex items-center gap-3 p-3.5 rounded-xl" style={{ backgroundColor: "rgba(122,90,248,0.06)", border: "1px solid var(--th-border)" }}>
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: "var(--th-bg-hover)" }}><PrinterIcon /></div>
+              <div className="flex-1 min-w-0">
+                <div className="text-[13px] font-bold truncate" style={{ color: "var(--th-text-primary)" }}>{fax.subject}</div>
+                <div className="text-[12px]" style={{ color: "var(--th-text-muted)" }}>From: {fax.number}</div>
+              </div>
+              <span className="px-2.5 py-1 rounded-md text-[11px] font-bold shrink-0" style={{ backgroundColor: "rgba(122,90,248,0.12)", color: "#7A5AF8" }}>{fax.pages} pages</span>
+            </div>
+          </div>
+          {cover && (
+            <CoverFields
+              coverTab={coverTab} setCoverTab={setCoverTab}
+              subject={subject} setSubject={setSubject}
+              message={message} setMessage={setMessage}
+              template={template} setTemplate={setTemplate}
+              from={from} to={chips[0] || recipInput.trim() || "—"}
+              onNotify={onNotify}
+            />
           )}
         </div>
+      </div>
+      <div className="flex items-center justify-end gap-4 px-6 py-4 border-t shrink-0" style={{ borderColor: "var(--th-border)" }}>
+        <button onClick={onClose} className="text-[13px] font-bold uppercase tracking-wider" style={{ color: "var(--th-text-secondary)" }}>Cancel</button>
+        <button onClick={forward} disabled={chips.length === 0 && !recipInput.trim()} className="btn-primary px-6 py-2.5 rounded-xl text-[13px] font-bold uppercase tracking-wider disabled:opacity-40 disabled:cursor-not-allowed" style={{ backgroundColor: "var(--th-fax-cta-bg)", color: "var(--th-fax-cta-text)" }}>Forward</button>
       </div>
     </DialogShell>
   );
