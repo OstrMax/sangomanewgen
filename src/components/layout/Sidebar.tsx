@@ -91,32 +91,34 @@ export default function Sidebar() {
           <Link
             key={item.href}
             href={item.href}
-            className={`flex flex-col items-center justify-center gap-1 w-14 rounded-lg relative no-underline transition-colors ${
+            data-active={isActive ? "true" : "false"}
+            aria-current={isActive ? "page" : undefined}
+            className={`sidebar-tab group flex flex-col items-center justify-center gap-1 w-14 rounded-xl relative no-underline ${
               extraPy ? "py-1.5 my-1" : "h-14"
-            } ${
-              !isActive ? "hover:bg-white/10" : ""
             }`}
-            style={isActive ? { backgroundColor: "var(--th-sidebar-active)" } : undefined}
           >
+            {/* Glass surface — shows on hover & active */}
+            <span
+              aria-hidden="true"
+              className="sidebar-tab__surface absolute inset-0 rounded-xl pointer-events-none"
+            />
             <Image
               src={asset(item.icon)}
               alt={item.label}
               width={item.iconSize}
               height={item.iconSize}
-              className={`shrink-0 transition-opacity ${isActive ? "opacity-100" : "opacity-70"}`}
+              className="sidebar-tab__icon shrink-0 relative z-10"
             />
             <span
-              className={`text-[10px] leading-3 text-center tracking-[0.4px] whitespace-pre-wrap w-[46px] font-[family-name:var(--font-manrope)] transition-all ${
-                isActive
-                  ? "text-white font-semibold"
-                  : "text-white/70 font-medium"
+              className={`sidebar-tab__label relative z-10 text-[10px] leading-3 text-center tracking-[0.4px] whitespace-pre-wrap w-[46px] font-[family-name:var(--font-manrope)] ${
+                isActive ? "text-white font-semibold" : "text-white/70 font-medium"
               }`}
             >
               {item.label}
             </span>
             {item.badge && (
               <span
-                className="absolute top-[6px] right-[10px] w-2.5 h-2.5 bg-[#fcc624] rounded-full"
+                className="absolute top-[6px] right-[10px] w-2.5 h-2.5 bg-[#fcc624] rounded-full z-20"
                 style={{ border: "2px solid var(--th-sidebar-badge-border)" }}
               />
             )}
