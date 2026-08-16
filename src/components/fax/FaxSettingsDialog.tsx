@@ -5,16 +5,20 @@ import { useState } from "react";
 type Tpl = { id: string; name: string; attention: string; subject: string; message: string; header: boolean; footer: boolean };
 
 const seedTemplates: Tpl[] = [
-  { id: "legal", name: "Legal", attention: "Legal Team", subject: "", message: "", header: true, footer: false },
-  { id: "medical", name: "Medical", attention: "Records Dept", subject: "", message: "", header: true, footer: false },
+  { id: "legal", name: "Cover for legal", attention: "Legal Team", subject: "", message: "", header: true, footer: false },
+  { id: "medical", name: "Cover for medical", attention: "Records Dept", subject: "", message: "", header: true, footer: false },
 ];
 
 const defaultCovers = ["Confidential", "Contempo", "Elegant", "Express", "Formal", "Jazzy", "Modern", "Urgent"];
 
-/* `newTemplate` deep-links straight into Cover sheet › Custom template › new,
-   so "New template" inside a compose dialog lands on the create form. */
-export default function FaxSettingsDialog({ onClose, newTemplate = false }: { onClose: () => void; newTemplate?: boolean }) {
-  const [section, setSection] = useState<"alerts" | "cover">(newTemplate ? "cover" : "alerts");
+/* Where to land when a fax dialog sends the user here: straight to the create
+   form, or onto one named template so "Edit …" opens that exact cover sheet. */
+export type TemplateLink = { mode: "new" } | { mode: "edit"; name: string };
+
+/* `returnTo` names the dialog waiting underneath ("New fax"), which adds the
+   breadcrumb back to it and turns Save into a save-and-go-back. */
+export default function FaxSettingsDialog({ onClose, deepLink, returnTo }: { onClose: () => void; deepLink?: TemplateLink; returnTo?: string }) {
+  const [section, setSection] = useState<"alerts" | "cover">(deepLink ? "cover" : "alerts");
 
   /* alerts state */
   const [emailAlerts, setEmailAlerts] = useState(true);
@@ -29,17 +33,22 @@ export default function FaxSettingsDialog({ onClose, newTemplate = false }: { on
   const [badge, setBadge] = useState(true);
 
   /* cover sheet state */
-  const [coverTab, setCoverTab] = useState<"default" | "custom">(newTemplate ? "custom" : "default");
+  const [coverTab, setCoverTab] = useState<"default" | "custom">(deepLink ? "custom" : "default");
   const [defaultCover, setDefaultCover] = useState("Modern");
   const [templates, setTemplates] = useState<Tpl[]>(seedTemplates);
-  const [currentId, setCurrentId] = useState<string>(seedTemplates[0].id);
-  const [mode, setMode] = useState<"edit" | "new" | "preview">(newTemplate ? "new" : "edit");
-  const [draftName, setDraftName] = useState("");
-  const [draft, setDraft] = useState<Omit<Tpl, "id" | "name">>(
-    newTemplate ? { attention: "", subject: "", message: "", header: true, footer: false } : { attention: "Legal Team", subject: "", message: "", header: true, footer: false },
+  const [currentId, setCurrentId] = useState<string>(
+    (deepLink?.mode === "edit" && seedTemplates.find((t) => t.name === deepLink.name)?.id) || seedTemplates[0].id,
   );
+  const [mode, setMode] = useState<"edit" | "new" | "preview">(deepLink?.mode === "new" ? "new" : "edit");
+  const [draftName, setDraftName] = useState("");
+  const [draft, setDraft] = useState<Omit<Tpl, "id" | "name">>({ attention: "", subject: "", message: "", header: true, footer: false });
 
   const current = templates.find((t) => t.id === currentId);
+
+  /* Only the deep-linked dialog gets a task-specific title — opened from the
+     gear it is just the settings screen. */
+  const headerTitle = !deepLink ? "Fax settings" : mode === "new" ? "New custom template" : mode === "preview" ? "Cover sheet preview" : `Edit “${current?.name ?? "template"}”`;
+
   const editing = mode === "new" ? { name: draftName, ...draft } : { name: current?.name ?? "", attention: current?.attention ?? "", subject: current?.subject ?? "", message: current?.message ?? "", header: current?.header ?? true, footer: current?.footer ?? false };
 
   const patch = (p: Partial<Omit<Tpl, "id" | "name">>) => {
@@ -60,6 +69,8 @@ export default function FaxSettingsDialog({ onClose, newTemplate = false }: { on
       setTemplates((ts) => [...ts, { id, name, ...draft }]);
       setCurrentId(id);
       setMode("edit");
+      /* Came from a half-written fax — hand control straight back to it. */
+      if (returnTo) onClose();
       return;
     }
     onClose();
@@ -72,10 +83,22 @@ export default function FaxSettingsDialog({ onClose, newTemplate = false }: { on
         style={{ backgroundColor: "var(--th-bg-card)" }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 h-[60px] shrink-0 border-b" style={{ borderColor: "var(--th-border)" }}>
-          <h2 className="text-[17px] font-bold" style={{ color: "var(--th-text-primary)" }}>Fax settings</h2>
-          <button onClick={onClose} className="p-1.5 rounded-lg transition-colors hover:bg-[var(--th-bg-hover)]" data-tip="Close">
+        {/* Header — when a fax sent us here the trail comes first and the title
+            below names the job, so the crumb never just repeats the title. */}
+        <div className={`flex justify-between px-6 shrink-0 border-b ${returnTo ? "py-3" : "h-[60px] items-center"}`} style={{ borderColor: "var(--th-border)" }}>
+          <div className="min-w-0">
+            {returnTo && (
+              <nav className="flex items-center gap-1.5 mb-0.5" aria-label="Breadcrumb">
+                <button onClick={onClose} className="text-[12px] font-semibold shrink-0 transition-opacity hover:opacity-70 hover:underline underline-offset-2" style={{ color: "#142B53" }}>
+                  {returnTo}
+                </button>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--th-text-muted)" strokeWidth="2.4" className="shrink-0"><polyline points="9 18 15 12 9 6" /></svg>
+                <span className="text-[12px] font-semibold truncate" style={{ color: "var(--th-text-muted)" }}>Fax settings</span>
+              </nav>
+            )}
+            <h2 className="text-[17px] font-bold truncate" style={{ color: "var(--th-text-primary)" }}>{headerTitle}</h2>
+          </div>
+          <button onClick={onClose} className={`p-1.5 rounded-lg transition-colors hover:bg-[var(--th-bg-hover)] ${returnTo ? "self-start" : ""}`} data-tip={returnTo ? `Back to ${returnTo.toLowerCase()}` : "Close"}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--th-text-muted)" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
           </button>
         </div>
@@ -200,7 +223,7 @@ export default function FaxSettingsDialog({ onClose, newTemplate = false }: { on
                   <div className="space-y-4">
                     {mode === "new" ? (
                       <>
-                        <p className="text-[13px] font-bold" style={{ color: "var(--th-text-primary)" }}>New custom template</p>
+                        {!deepLink && <p className="text-[13px] font-bold" style={{ color: "var(--th-text-primary)" }}>New custom template</p>}
                         <Field label="Template name">
                           <input value={draftName} onChange={(e) => setDraftName(e.target.value)} placeholder="e.g. Cover for legal" className="w-full px-4 py-2.5 rounded-xl text-[14px] outline-none placeholder:text-[#9AA3AB]" style={inputStyle} />
                         </Field>
@@ -269,7 +292,9 @@ export default function FaxSettingsDialog({ onClose, newTemplate = false }: { on
           ) : (
             <div className="flex items-center gap-4">
               <button onClick={onClose} className="text-[13px] font-bold uppercase tracking-wider" style={{ color: "var(--th-text-secondary)" }}>Cancel</button>
-              <button onClick={save} className="btn-primary px-6 py-2.5 rounded-xl text-[13px] font-bold uppercase tracking-wider" style={{ backgroundColor: "#142B53", color: "#fff" }}>Save</button>
+              <button onClick={save} className="btn-primary px-6 py-2.5 rounded-xl text-[13px] font-bold uppercase tracking-wider" style={{ backgroundColor: "#142B53", color: "#fff" }}>
+                {returnTo ? "Save & return" : "Save"}
+              </button>
             </div>
           )}
         </div>
