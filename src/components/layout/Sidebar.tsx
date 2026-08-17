@@ -92,6 +92,7 @@ export default function Sidebar() {
             key={item.href}
             href={item.href}
             data-active={isActive ? "true" : "false"}
+            data-tour={item.href}
             aria-current={isActive ? "page" : undefined}
             className={`sidebar-tab group flex flex-col items-center justify-center gap-1 w-14 rounded-xl relative no-underline ${
               extraPy ? "py-1.5 my-1" : "h-14"

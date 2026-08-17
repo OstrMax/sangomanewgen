@@ -11,14 +11,13 @@ const seedTemplates: Tpl[] = [
 
 const defaultCovers = ["Confidential", "Contempo", "Elegant", "Express", "Formal", "Jazzy", "Modern", "Urgent"];
 
-/* Where to land when a fax dialog sends the user here: straight to the create
-   form, or onto one named template so "Edit …" opens that exact cover sheet. */
-export type TemplateLink = { mode: "new" } | { mode: "edit"; name: string };
-
-/* `returnTo` names the dialog waiting underneath ("New fax"), which adds the
-   breadcrumb back to it and turns Save into a save-and-go-back. */
-export default function FaxSettingsDialog({ onClose, deepLink, returnTo }: { onClose: () => void; deepLink?: TemplateLink; returnTo?: string }) {
-  const [section, setSection] = useState<"alerts" | "cover">(deepLink ? "cover" : "alerts");
+/* `openTemplate` names the cover sheet a fax dialog wants opened, landing the
+   user on that exact template — adding another is the "+ New" button already
+   sitting beside it, so one link covers both jobs.  `returnTo` names the dialog
+   waiting underneath ("New fax"), which adds the breadcrumb back to it and
+   turns Save into a save-and-go-back. */
+export default function FaxSettingsDialog({ onClose, openTemplate, returnTo }: { onClose: () => void; openTemplate?: string; returnTo?: string }) {
+  const [section, setSection] = useState<"alerts" | "cover">(openTemplate ? "cover" : "alerts");
 
   /* alerts state */
   const [emailAlerts, setEmailAlerts] = useState(true);
@@ -33,13 +32,11 @@ export default function FaxSettingsDialog({ onClose, deepLink, returnTo }: { onC
   const [badge, setBadge] = useState(true);
 
   /* cover sheet state */
-  const [coverTab, setCoverTab] = useState<"default" | "custom">(deepLink ? "custom" : "default");
+  const [coverTab, setCoverTab] = useState<"default" | "custom">(openTemplate ? "custom" : "default");
   const [defaultCover, setDefaultCover] = useState("Modern");
   const [templates, setTemplates] = useState<Tpl[]>(seedTemplates);
-  const [currentId, setCurrentId] = useState<string>(
-    (deepLink?.mode === "edit" && seedTemplates.find((t) => t.name === deepLink.name)?.id) || seedTemplates[0].id,
-  );
-  const [mode, setMode] = useState<"edit" | "new" | "preview">(deepLink?.mode === "new" ? "new" : "edit");
+  const [currentId, setCurrentId] = useState<string>(seedTemplates.find((t) => t.name === openTemplate)?.id ?? seedTemplates[0].id);
+  const [mode, setMode] = useState<"edit" | "new" | "preview">("edit");
   const [draftName, setDraftName] = useState("");
   const [draft, setDraft] = useState<Omit<Tpl, "id" | "name">>({ attention: "", subject: "", message: "", header: true, footer: false });
 
@@ -47,7 +44,7 @@ export default function FaxSettingsDialog({ onClose, deepLink, returnTo }: { onC
 
   /* Only the deep-linked dialog gets a task-specific title — opened from the
      gear it is just the settings screen. */
-  const headerTitle = !deepLink ? "Fax settings" : mode === "new" ? "New custom template" : mode === "preview" ? "Cover sheet preview" : `Edit “${current?.name ?? "template"}”`;
+  const headerTitle = !openTemplate ? "Fax settings" : mode === "new" ? "New custom template" : mode === "preview" ? "Cover sheet preview" : `Edit “${current?.name ?? "template"}”`;
 
   const editing = mode === "new" ? { name: draftName, ...draft } : { name: current?.name ?? "", attention: current?.attention ?? "", subject: current?.subject ?? "", message: current?.message ?? "", header: current?.header ?? true, footer: current?.footer ?? false };
 
@@ -83,18 +80,15 @@ export default function FaxSettingsDialog({ onClose, deepLink, returnTo }: { onC
         style={{ backgroundColor: "var(--th-bg-card)" }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header — when a fax sent us here the trail comes first and the title
-            below names the job, so the crumb never just repeats the title. */}
+        {/* Header — a fax waiting underneath gets a back link above the title,
+            since there is only one way out of this detour. */}
         <div className={`flex justify-between px-6 shrink-0 border-b ${returnTo ? "py-3" : "h-[60px] items-center"}`} style={{ borderColor: "var(--th-border)" }}>
           <div className="min-w-0">
             {returnTo && (
-              <nav className="flex items-center gap-1.5 mb-0.5" aria-label="Breadcrumb">
-                <button onClick={onClose} className="text-[12px] font-semibold shrink-0 transition-opacity hover:opacity-70 hover:underline underline-offset-2" style={{ color: "#142B53" }}>
-                  {returnTo}
-                </button>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--th-text-muted)" strokeWidth="2.4" className="shrink-0"><polyline points="9 18 15 12 9 6" /></svg>
-                <span className="text-[12px] font-semibold truncate" style={{ color: "var(--th-text-muted)" }}>Fax settings</span>
-              </nav>
+              <button onClick={onClose} className="flex items-center gap-1 mb-0.5 text-[12px] font-semibold transition-opacity hover:opacity-70 hover:underline underline-offset-2" style={{ color: "#142B53" }}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className="shrink-0"><line x1="19" y1="12" x2="5" y2="12" /><polyline points="11 18 5 12 11 6" /></svg>
+                Back to {returnTo.toLowerCase()}
+              </button>
             )}
             <h2 className="text-[17px] font-bold truncate" style={{ color: "var(--th-text-primary)" }}>{headerTitle}</h2>
           </div>
@@ -223,7 +217,7 @@ export default function FaxSettingsDialog({ onClose, deepLink, returnTo }: { onC
                   <div className="space-y-4">
                     {mode === "new" ? (
                       <>
-                        {!deepLink && <p className="text-[13px] font-bold" style={{ color: "var(--th-text-primary)" }}>New custom template</p>}
+                        {!openTemplate && <p className="text-[13px] font-bold" style={{ color: "var(--th-text-primary)" }}>New custom template</p>}
                         <Field label="Template name">
                           <input value={draftName} onChange={(e) => setDraftName(e.target.value)} placeholder="e.g. Cover for legal" className="w-full px-4 py-2.5 rounded-xl text-[14px] outline-none placeholder:text-[#9AA3AB]" style={inputStyle} />
                         </Field>

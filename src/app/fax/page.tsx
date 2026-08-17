@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import FaxWalkthrough, { shouldAutoStartFaxTour } from "@/components/walkthrough/FaxWalkthrough";
-import FaxSettingsDialog, { type TemplateLink } from "@/components/fax/FaxSettingsDialog";
+import FaxSettingsDialog from "@/components/fax/FaxSettingsDialog";
 
 /* ────────────────────────────────────────────────────────────
    Types & data
@@ -77,8 +77,8 @@ export default function FaxPage() {
   const [compose, setCompose] = useState<null | { mode: "new" }>(null);
   const [forwardFax, setForwardFax] = useState<FaxItem | null>(null);
   /* Which fax dialog sent the user to Fax settings (so we can label the way
-     back) and which template it wanted to open. */
-  const [templateEditor, setTemplateEditor] = useState<null | { from: "New fax" | "Forward fax"; link: TemplateLink }>(null);
+     back) and which template it wanted opened. */
+  const [templateEditor, setTemplateEditor] = useState<null | { from: "New fax" | "Forward fax"; name: string }>(null);
   const [showNewFolder, setShowNewFolder] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [moveMenu, setMoveMenu] = useState(false);
@@ -509,9 +509,9 @@ export default function FaxPage() {
       )}
 
       {/* ───────── Dialogs / overlays ───────── */}
-      {compose && <ComposeFaxDialog onClose={() => setCompose(null)} onSent={(sub, sub2) => { setCompose(null); fireToast("Fax sent", sub2); }} onOpenTemplates={(link) => setTemplateEditor({ from: "New fax", link })} />}
-      {forwardFax && <ForwardFaxDialog fax={forwardFax} onClose={() => setForwardFax(null)} onForward={(to) => { setForwardFax(null); fireToast("Fax forwarded", `Your fax was forwarded to ${to}`); }} onOpenTemplates={(link) => setTemplateEditor({ from: "Forward fax", link })} />}
-      {templateEditor && <FaxSettingsDialog deepLink={templateEditor.link} returnTo={templateEditor.from} onClose={() => setTemplateEditor(null)} />}
+      {compose && <ComposeFaxDialog onClose={() => setCompose(null)} onSent={(sub, sub2) => { setCompose(null); fireToast("Fax sent", sub2); }} onOpenTemplates={(name) => setTemplateEditor({ from: "New fax", name })} />}
+      {forwardFax && <ForwardFaxDialog fax={forwardFax} onClose={() => setForwardFax(null)} onForward={(to) => { setForwardFax(null); fireToast("Fax forwarded", `Your fax was forwarded to ${to}`); }} onOpenTemplates={(name) => setTemplateEditor({ from: "Forward fax", name })} />}
+      {templateEditor && <FaxSettingsDialog openTemplate={templateEditor.name} returnTo={templateEditor.from} onClose={() => setTemplateEditor(null)} />}
       {showNewFolder && <NewFolderDialog onClose={() => setShowNewFolder(false)} onCreate={createFolder} />}
       {renameFolder && <RenameFolderDialog folder={renameFolder} onClose={() => setRenameFolder(null)} onRename={(name) => doRenameFolder(renameFolder.id, name)} />}
       {deleteFolder && (
@@ -806,7 +806,7 @@ function RecipientInput({ chips, onAdd, onRemove, value, onValueChange }: { chip
    Default cover / Custom template inline.  Checking "cover sheet only" hides
    the attachment block and forces the cover on.  Template *editing* lives in
    Fax settings — the Custom template tab only picks one.                    */
-function ComposeFaxDialog({ onClose, onSent, onOpenTemplates }: { onClose: () => void; onSent: (a: string, b: string) => void; onOpenTemplates: (link: TemplateLink) => void }) {
+function ComposeFaxDialog({ onClose, onSent, onOpenTemplates }: { onClose: () => void; onSent: (a: string, b: string) => void; onOpenTemplates: (name: string) => void }) {
   const [from, setFrom] = useState(senderNumbers[0]);
   const [chips, setChips] = useState<string[]>([]);
   const [recipInput, setRecipInput] = useState("");
@@ -920,31 +920,23 @@ function ComposeFaxDialog({ onClose, onSent, onOpenTemplates }: { onClose: () =>
 }
 
 /* Custom template tab: pick a saved template.  Authoring lives in Fax settings,
-   so each link names the exact template it opens instead of a vague "New", and
-   the caption says where you land and that the fax survives the trip. */
-function TemplatePicker({ value, onChange, onOpenTemplates }: { value: string; onChange: (v: string) => void; onOpenTemplates: (link: TemplateLink) => void }) {
+   so one link goes there, trailing arrow marking the trip out.  It lands on the
+   chosen cover sheet with "+ New" beside it, so editing and adding are the same
+   journey — and a back link there returns to this half-written fax. */
+function TemplatePicker({ value, onChange, onOpenTemplates }: { value: string; onChange: (v: string) => void; onOpenTemplates: (name: string) => void }) {
   return (
     <div>
       <FieldLabel hint="(choose one)">Template</FieldLabel>
       <Select value={value} onChange={onChange} options={["Cover for legal", "Cover for medical"]} />
-      <div className="flex items-center gap-3 mt-2.5">
-        <SettingsLink onClick={() => onOpenTemplates({ mode: "edit", name: value })}>Edit “{value}”</SettingsLink>
-        <span className="text-[13px]" style={{ color: "var(--th-border)" }}>|</span>
-        <SettingsLink onClick={() => onOpenTemplates({ mode: "new" })}>Create a new template</SettingsLink>
-      </div>
-      <p className="text-[11px] mt-1.5" style={{ color: "var(--th-text-muted)" }}>
-        Opens Fax settings › Cover sheet. This fax stays open — save and you&apos;ll come straight back.
-      </p>
+      <button
+        onClick={() => onOpenTemplates(value)}
+        className="flex items-center gap-1.5 mt-2.5 text-[13px] font-semibold underline underline-offset-2 transition-opacity hover:opacity-70"
+        style={{ color: "#142B53" }}
+      >
+        Manage templates in Fax settings
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className="shrink-0"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="13 6 19 12 13 18" /></svg>
+      </button>
     </div>
-  );
-}
-
-function SettingsLink({ onClick, children }: { onClick: () => void; children: React.ReactNode }) {
-  return (
-    <button onClick={onClick} className="flex items-center gap-1 text-[13px] font-semibold underline underline-offset-2 transition-opacity hover:opacity-70" style={{ color: "#142B53" }}>
-      {children}
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M7 17L17 7" /><polyline points="8 7 17 7 17 16" /></svg>
-    </button>
   );
 }
 
@@ -990,7 +982,7 @@ function Select({ value, onChange, options }: { value: string; onChange: (v: str
    From → Recipients → Forwarding (original fax) → "Include a cover sheet"
    toggle.  Turning it on expands Default cover / Custom template inline.
    Custom template only *picks* a template — editing lives in Fax settings. */
-function ForwardFaxDialog({ fax, onClose, onForward, onOpenTemplates }: { fax: FaxItem; onClose: () => void; onForward: (to: string) => void; onOpenTemplates: (link: TemplateLink) => void }) {
+function ForwardFaxDialog({ fax, onClose, onForward, onOpenTemplates }: { fax: FaxItem; onClose: () => void; onForward: (to: string) => void; onOpenTemplates: (name: string) => void }) {
   const [from, setFrom] = useState(senderNumbers[0]);
   const [chips, setChips] = useState<string[]>([]);
   const [recipInput, setRecipInput] = useState("");

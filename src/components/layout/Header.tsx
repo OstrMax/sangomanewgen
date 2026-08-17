@@ -65,6 +65,7 @@ export default function Header({
         {/* AI Assist toggle */}
         <button
           onClick={onToggleAI}
+          data-tour="ai-assist"
           className={`p-1.5 rounded-full transition-all duration-200 ${
             aiPanelOpen
               ? "bg-white/20 hover:bg-white/30"

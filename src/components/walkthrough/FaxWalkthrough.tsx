@@ -123,7 +123,8 @@ export default function FaxWalkthrough({ active, onClose }: { active: boolean; o
 
   return (
     <>
-      {/* Dim backdrop with spotlight cutout */}
+      {/* Ring the step's target.  No backdrop and nothing covering the page —
+          the tour points things out, it doesn't take the screen hostage. */}
       <div
         className="fixed z-[997] rounded-xl pointer-events-none transition-all duration-300"
         style={{
@@ -131,12 +132,12 @@ export default function FaxWalkthrough({ active, onClose }: { active: boolean; o
           left: spotLeft,
           width: spotW,
           height: spotH,
-          boxShadow: "0 0 0 9999px rgba(0,10,20,0.55)",
           border: "2px solid rgba(255,255,255,0.9)",
+          /* Thin dark ring outside the white one so the highlight reads on the
+             light page as well as on the dark sidebar. */
+          boxShadow: "0 0 0 2px rgba(0,10,20,0.35)",
         }}
       />
-      {/* Click-catcher to advance / block interaction */}
-      <div className="fixed inset-0 z-[997]" onClick={next} />
 
       {/* Bubble */}
       <div
