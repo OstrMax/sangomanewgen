@@ -2,14 +2,15 @@
 
 import { useState } from "react";
 
-type Tpl = { id: string; name: string; attention: string; subject: string; message: string; header: boolean; footer: boolean };
+/* A template is just the reusable *stationery* — its name and its header /
+   footer artwork.  The per-fax wording (attention, subject, message) is typed
+   in the send dialog, because it changes with every fax. */
+type Tpl = { id: string; name: string; header: boolean; footer: boolean };
 
 const seedTemplates: Tpl[] = [
-  { id: "legal", name: "Cover for legal", attention: "Legal Team", subject: "", message: "", header: true, footer: false },
-  { id: "medical", name: "Cover for medical", attention: "Records Dept", subject: "", message: "", header: true, footer: false },
+  { id: "legal", name: "Cover for legal", header: true, footer: false },
+  { id: "medical", name: "Cover for medical", header: true, footer: false },
 ];
-
-const defaultCovers = ["Confidential", "Contempo", "Elegant", "Express", "Formal", "Jazzy", "Modern", "Urgent"];
 
 /* `openTemplate` names the cover sheet a fax dialog wants opened, landing the
    user on that exact template — adding another is the "+ New" button already
@@ -32,13 +33,11 @@ export default function FaxSettingsDialog({ onClose, openTemplate, returnTo }: {
   const [badge, setBadge] = useState(true);
 
   /* cover sheet state */
-  const [coverTab, setCoverTab] = useState<"default" | "custom">(openTemplate ? "custom" : "default");
-  const [defaultCover, setDefaultCover] = useState("Modern");
   const [templates, setTemplates] = useState<Tpl[]>(seedTemplates);
   const [currentId, setCurrentId] = useState<string>(seedTemplates.find((t) => t.name === openTemplate)?.id ?? seedTemplates[0].id);
   const [mode, setMode] = useState<"edit" | "new" | "preview">("edit");
   const [draftName, setDraftName] = useState("");
-  const [draft, setDraft] = useState<Omit<Tpl, "id" | "name">>({ attention: "", subject: "", message: "", header: true, footer: false });
+  const [draft, setDraft] = useState<Omit<Tpl, "id" | "name">>({ header: true, footer: false });
 
   const current = templates.find((t) => t.id === currentId);
 
@@ -46,7 +45,7 @@ export default function FaxSettingsDialog({ onClose, openTemplate, returnTo }: {
      gear it is just the settings screen. */
   const headerTitle = !openTemplate ? "Fax settings" : mode === "new" ? "New custom template" : mode === "preview" ? "Cover sheet preview" : `Edit “${current?.name ?? "template"}”`;
 
-  const editing = mode === "new" ? { name: draftName, ...draft } : { name: current?.name ?? "", attention: current?.attention ?? "", subject: current?.subject ?? "", message: current?.message ?? "", header: current?.header ?? true, footer: current?.footer ?? false };
+  const editing = mode === "new" ? { name: draftName, ...draft } : { name: current?.name ?? "", header: current?.header ?? true, footer: current?.footer ?? false };
 
   const patch = (p: Partial<Omit<Tpl, "id" | "name">>) => {
     if (mode === "new") setDraft((d) => ({ ...d, ...p }));
@@ -55,8 +54,16 @@ export default function FaxSettingsDialog({ onClose, openTemplate, returnTo }: {
 
   const startNew = () => {
     setDraftName("");
-    setDraft({ attention: "", subject: "", message: "", header: true, footer: false });
+    setDraft({ header: true, footer: false });
     setMode("new");
+  };
+
+  /* Dropping a template falls back to whatever is left; emptying the list drops
+     the screen into its own empty state, which offers to create the first one. */
+  const remove = () => {
+    const rest = templates.filter((t) => t.id !== currentId);
+    setTemplates(rest);
+    if (rest.length) setCurrentId(rest[0].id);
   };
 
   const save = () => {
@@ -159,46 +166,10 @@ export default function FaxSettingsDialog({ onClose, openTemplate, returnTo }: {
               </>
             ) : (
               <>
-                <SectionHead title="Cover sheet" sub="Choose or edit your cover sheets" />
-
-                {mode !== "preview" && (
-                  <div className="flex items-center gap-6 border-b mb-5" style={{ borderColor: "var(--th-border)" }}>
-                    {([["default", "Default cover"], ["custom", "Custom template"]] as const).map(([id, label]) => (
-                      <button key={id} onClick={() => setCoverTab(id)} className="pb-2.5 text-[14px] font-semibold transition-colors relative" style={{ color: coverTab === id ? "var(--th-text-primary)" : "var(--th-text-muted)" }}>
-                        {label}
-                        {coverTab === id && <span className="absolute bottom-0 left-0 right-0 h-[2px]" style={{ backgroundColor: "#142B53" }} />}
-                      </button>
-                    ))}
-                  </div>
-                )}
+                <SectionHead title="Cover sheet" sub="Choose or edit your custom cover sheets" />
 
                 {mode === "preview" ? (
-                  <CoverPreview name={editing.name || draftName} attention={editing.attention} subject={editing.subject} message={editing.message} />
-                ) : coverTab === "default" ? (
-                  <div className="grid grid-cols-3 gap-4">
-                    {defaultCovers.map((name) => {
-                      const selected = defaultCover === name;
-                      return (
-                        <button
-                          key={name}
-                          onClick={() => setDefaultCover(name)}
-                          className="rounded-xl p-3 transition-all text-left group"
-                          style={{ border: selected ? "2px solid #142B53" : "1px solid var(--th-border)", backgroundColor: "var(--th-bg-card)" }}
-                        >
-                          <div className="relative rounded-lg overflow-hidden mb-2.5" style={{ border: "1px solid var(--th-border)", backgroundColor: "#fff" }}>
-                            <CoverThumb variant={name} />
-                            <span
-                              className="absolute top-1.5 right-1.5 w-[18px] h-[18px] rounded-[5px] flex items-center justify-center transition-all"
-                              style={{ backgroundColor: selected ? "#142B53" : "rgba(255,255,255,0.9)", border: selected ? "none" : "1px solid #CCCFD2" }}
-                            >
-                              {selected && <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5"><polyline points="20 6 9 17 4 12" /></svg>}
-                            </span>
-                          </div>
-                          <div className="text-[13px] font-semibold text-center" style={{ color: "var(--th-text-primary)" }}>{name}</div>
-                        </button>
-                      );
-                    })}
-                  </div>
+                  <CoverPreview name={editing.name || draftName} />
                 ) : templates.length === 0 && mode !== "new" ? (
                   <div className="flex flex-col items-center justify-center text-center py-14">
                     <div className="flex items-center justify-center w-12 h-12 rounded-xl mb-4" style={{ backgroundColor: "var(--th-bg-hover)" }}>
@@ -206,7 +177,7 @@ export default function FaxSettingsDialog({ onClose, openTemplate, returnTo }: {
                     </div>
                     <p className="text-[14px] font-bold" style={{ color: "var(--th-text-primary)" }}>No custom templates yet</p>
                     <p className="text-[12px] leading-relaxed mt-1.5 max-w-[330px]" style={{ color: "var(--th-text-muted)" }}>
-                      Create a cover sheet with your own logo, header &amp; footer images, and a saved message. It&apos;ll show up here and in the &ldquo;Default cover&rdquo; tab.
+                      Create a cover sheet with your own header &amp; footer artwork. It&apos;ll show up here and under &ldquo;Custom template&rdquo; whenever you send or forward a fax.
                     </p>
                     <button onClick={startNew} className="btn-primary mt-5 px-5 py-2.5 rounded-xl text-[13px] font-bold uppercase tracking-wider flex items-center gap-2" style={{ backgroundColor: "#142B53", color: "#fff" }}>
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
@@ -217,7 +188,17 @@ export default function FaxSettingsDialog({ onClose, openTemplate, returnTo }: {
                   <div className="space-y-4">
                     {mode === "new" ? (
                       <>
-                        {!openTemplate && <p className="text-[13px] font-bold" style={{ color: "var(--th-text-primary)" }}>New custom template</p>}
+                        {/* Back out of authoring only once there is a list to go
+                            back to — on a first template it would lead nowhere. */}
+                        <div className="flex items-center gap-3">
+                          {templates.length > 0 && (
+                            <button onClick={() => setMode("edit")} className="flex items-center gap-1 text-[12px] font-semibold transition-opacity hover:opacity-70 hover:underline underline-offset-2" style={{ color: "#142B53" }}>
+                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className="shrink-0"><line x1="19" y1="12" x2="5" y2="12" /><polyline points="11 18 5 12 11 6" /></svg>
+                              Back
+                            </button>
+                          )}
+                          <p className="text-[13px] font-bold" style={{ color: "var(--th-text-primary)" }}>New custom template</p>
+                        </div>
                         <Field label="Template name">
                           <input value={draftName} onChange={(e) => setDraftName(e.target.value)} placeholder="e.g. Cover for legal" className="w-full px-4 py-2.5 rounded-xl text-[14px] outline-none placeholder:text-[#9AA3AB]" style={inputStyle} />
                         </Field>
@@ -231,9 +212,9 @@ export default function FaxSettingsDialog({ onClose, openTemplate, returnTo }: {
                             </select>
                             <svg className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--th-text-muted)" strokeWidth="2"><polyline points="6 9 12 15 18 9" /></svg>
                           </div>
-                          <button onClick={startNew} className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-[13px] font-semibold shrink-0 transition-colors" style={{ border: "1px solid var(--th-border)", color: "var(--th-text-primary)" }}>
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-                            New
+                          <button onClick={startNew} className="flex items-center gap-1 px-3 h-[42px] rounded-lg text-[12px] font-bold uppercase tracking-wider shrink-0 transition-colors hover:bg-[var(--th-bg-hover)]" style={{ color: "#142B53" }}>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+                            Add new
                           </button>
                         </div>
                       </Field>
@@ -253,20 +234,19 @@ export default function FaxSettingsDialog({ onClose, openTemplate, returnTo }: {
                       <span className="font-bold" style={{ color: "var(--th-text-primary)" }}>Please note:</span> (Header and footer images must be 1500px x 500px max, PNG/JPG only)
                     </p>
 
-                    <Field label="Attention">
-                      <input value={editing.attention} onChange={(e) => patch({ attention: e.target.value })} placeholder="Who is this for?" className="w-full px-4 py-2.5 rounded-xl text-[14px] outline-none placeholder:text-[#9AA3AB]" style={inputStyle} />
-                    </Field>
-                    <Field label="Subject">
-                      <input value={editing.subject} onChange={(e) => patch({ subject: e.target.value })} placeholder="Write a subject here" className="w-full px-4 py-2.5 rounded-xl text-[14px] outline-none placeholder:text-[#9AA3AB]" style={inputStyle} />
-                    </Field>
-                    <Field label="Message">
-                      <textarea value={editing.message} onChange={(e) => patch({ message: e.target.value })} rows={3} placeholder="Write a short message for the cover sheet…" className="w-full px-4 py-2.5 rounded-xl text-[14px] outline-none resize-none placeholder:text-[#9AA3AB]" style={inputStyle} />
-                    </Field>
-
-                    <button onClick={() => setMode("preview")} className="w-full py-3 rounded-xl flex items-center justify-center gap-2 text-[13px] font-semibold transition-colors hover:opacity-90" style={{ backgroundColor: "var(--th-bg-hover)", color: "var(--th-text-primary)" }}>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
+                    <button onClick={() => setMode("preview")} className="w-full py-2.5 rounded-xl flex items-center justify-center gap-1.5 text-[13px] font-semibold border border-dashed transition-colors hover:opacity-80" style={{ backgroundColor: "var(--th-bg-hover)", borderColor: "var(--th-border)", color: "var(--th-text-primary)" }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
                       Preview cover sheet
                     </button>
+
+                    {/* Only an existing template can be deleted — in create mode
+                        there is nothing saved yet, and Cancel already backs out. */}
+                    {mode === "edit" && (
+                      <button onClick={remove} className="w-full py-2.5 rounded-xl flex items-center justify-center gap-1.5 text-[13px] font-semibold border border-dashed transition-colors hover:opacity-80" style={{ backgroundColor: "var(--th-bg-hover)", borderColor: "var(--th-border)", color: "#C70816" }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" /><path d="M10 11v6M14 11v6" /><path d="M9 6V4a2 2 0 012-2h2a2 2 0 012 2v2" /></svg>
+                        Delete cover sheet
+                      </button>
+                    )}
                   </div>
                 )}
               </>
@@ -275,12 +255,7 @@ export default function FaxSettingsDialog({ onClose, openTemplate, returnTo }: {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between gap-4 px-6 py-4 border-t shrink-0" style={{ borderColor: "var(--th-border)", backgroundColor: "var(--th-bg-hover)" }}>
-          <span className="text-[12px]" style={{ color: "var(--th-text-muted)" }}>
-            {section === "cover" && coverTab === "default" && mode !== "preview" && (
-              <>Default cover sheet: <span className="font-bold" style={{ color: "var(--th-text-primary)" }}>{defaultCover}</span></>
-            )}
-          </span>
+        <div className="flex items-center justify-end gap-4 px-6 py-4 border-t shrink-0" style={{ borderColor: "var(--th-border)", backgroundColor: "var(--th-bg-hover)" }}>
           {mode === "preview" ? (
             <button onClick={() => setMode(templates.some((t) => t.id === currentId) && draftName === "" ? "edit" : "new")} className="btn-primary px-5 py-2.5 rounded-xl text-[13px] font-bold uppercase tracking-wider" style={{ backgroundColor: "#142B53", color: "#fff" }}>Back to edit</button>
           ) : (
@@ -410,75 +385,10 @@ function ImageSlot({ filled, onToggle }: { filled: boolean; onToggle: () => void
   );
 }
 
-/* Abstract skeleton thumbnails for the built-in cover designs */
-function CoverThumb({ variant }: { variant: string }) {
-  const bar = (w: string, dark?: boolean) => (
-    <div className="h-[3px] rounded-full" style={{ width: w, backgroundColor: dark ? "#3C4650" : "#D5D8DC" }} />
-  );
-  return (
-    <div className="w-full aspect-[3/4] p-3 flex flex-col gap-1.5" style={{ backgroundColor: "#fff" }}>
-      {variant === "Confidential" && (
-        <>
-          <div className="flex flex-col gap-1">{bar("55%")}{bar("35%")}</div>
-          <div className="flex-1 border border-dashed rounded mt-1 flex items-center justify-center" style={{ borderColor: "#D5D8DC" }}>
-            <span className="text-[5px] tracking-[1px] font-semibold" style={{ color: "#9AA3AB" }}>CONFIDENTIAL</span>
-          </div>
-        </>
-      )}
-      {variant === "Contempo" && (
-        <>
-          <div className="flex gap-1.5 items-start"><div className="w-[38%] h-3 rounded-sm" style={{ backgroundColor: "#22262B" }} /><div className="flex-1 flex flex-col gap-1 pt-0.5">{bar("100%")}{bar("70%")}</div></div>
-          <div className="flex flex-col gap-1 mt-1">{bar("80%")}{bar("60%")}</div>
-          <div className="flex-1" />
-        </>
-      )}
-      {variant === "Elegant" && (
-        <>
-          <div className="flex flex-col gap-1 items-end">{bar("45%")}{bar("70%")}</div>
-          <div className="flex flex-col gap-1 mt-1">{bar("100%")}{bar("90%")}{bar("75%")}</div>
-          <div className="flex-1" />
-        </>
-      )}
-      {variant === "Express" && (
-        <>
-          <div className="flex items-center justify-between"><div className="flex flex-col gap-1 w-[55%]">{bar("100%")}{bar("60%")}</div><span className="text-[7px] font-bold" style={{ color: "#22262B" }}>FAX</span></div>
-          <div className="flex-1 border rounded mt-1" style={{ borderColor: "#D5D8DC" }} />
-        </>
-      )}
-      {variant === "Formal" && (
-        <>
-          <div className="text-[4px] tracking-[0.5px] text-center font-semibold" style={{ color: "#3C4650" }}>FACSIMILE TRANSMISSION</div>
-          <div className="flex flex-col gap-1 items-center">{bar("60%")}{bar("40%")}</div>
-          <div className="flex-1 border rounded mt-1" style={{ borderColor: "#D5D8DC" }} />
-          <div className="flex justify-center">{bar("30%")}</div>
-        </>
-      )}
-      {variant === "Jazzy" && (
-        <>
-          <div className="flex items-start gap-1.5"><span className="text-[8px] font-extrabold leading-none" style={{ color: "#22262B" }}>FAX</span><div className="flex-1 flex flex-col gap-1">{bar("100%")}{bar("80%")}</div></div>
-          <div className="flex flex-col gap-1 mt-1">{bar("90%")}{bar("65%")}</div>
-          <div className="flex-1" />
-        </>
-      )}
-      {variant === "Modern" && (
-        <>
-          <div className="flex flex-col gap-1">{bar("70%", true)}{bar("50%")}</div>
-          <div className="flex flex-col gap-1 mt-1.5">{bar("100%")}{bar("85%")}{bar("60%")}</div>
-          <div className="flex-1" />
-        </>
-      )}
-      {variant === "Urgent" && (
-        <>
-          <div className="text-[4px] tracking-[0.5px] text-center font-bold py-0.5 rounded-sm" style={{ backgroundColor: "#F2F3F5", color: "#3C4650" }}>URGENT FAX MESSAGE</div>
-          <div className="flex flex-col gap-1 mt-0.5">{bar("85%")}{bar("65%")}</div>
-          <div className="flex-1 border rounded mt-1" style={{ borderColor: "#D5D8DC" }} />
-        </>
-      )}
-    </div>
-  );
-}
-
-function CoverPreview({ name, attention, subject, message }: { name: string; attention: string; subject: string; message: string }) {
+/* The stationery, filled with sample wording — the real attention, subject and
+   message are typed per fax in the send dialog, so they can only be stand-ins
+   here. */
+function CoverPreview({ name }: { name: string }) {
   return (
     <div className="rounded-xl mx-auto max-w-[420px] p-10" style={{ backgroundColor: "#fff", border: "1px solid var(--th-border)", boxShadow: "0 2px 10px rgba(0,0,0,0.06)" }}>
       <div className="flex items-center gap-3 pb-8">
@@ -489,15 +399,15 @@ function CoverPreview({ name, attention, subject, message }: { name: string; att
         <PreviewRow k="From:" v="(555) 555-5555" />
         <PreviewRow k="To:" v="(555) 555-5555" />
         <PreviewRow k="Sender:" v="Billing Folks" />
-        <PreviewRow k="Attention:" v={attention || "—"} />
+        <PreviewRow k="Attention:" v="Legal Team" />
         <PreviewRow k="Company:" v="EasyGoing Inc." />
         <PreviewRow k="Date:" v="10/21/2015" />
-        <PreviewRow k="Subject:" v={subject || name || "—"} />
+        <PreviewRow k="Subject:" v={name || "—"} />
         <PreviewRow k="Pages:" v="1" />
       </div>
       <div className="mt-2 text-[9px]" style={{ color: "#22262B" }}>
         <p className="font-bold">Message:</p>
-        <p className="mt-1 pl-3">{message || "Your payment is due in 5 days"}</p>
+        <p className="mt-1 pl-3">Your payment is due in 5 days</p>
       </div>
       <div className="flex items-center gap-3 pt-16">
         <span className="px-2.5 py-1 rounded text-[10px] font-bold tracking-wider text-white" style={{ backgroundColor: "#22262B" }}>SANGOMA</span>

@@ -815,6 +815,9 @@ function ComposeFaxDialog({ onClose, onSent, onOpenTemplates }: { onClose: () =>
   const [file, setFile] = useState<{ name: string; size: string; pages: number } | null>(null);
   const [coverTab, setCoverTab] = useState<"default" | "custom">("default");
   const [template, setTemplate] = useState("Cover for legal");
+  const [attention, setAttention] = useState("Legal Team");
+  const [subject, setSubject] = useState("");
+  const [message, setMessage] = useState("");
 
   const hasRecipient = chips.length > 0 || recipInput.trim().length > 0;
   const canSend = hasRecipient && (coverOnly || cover || file !== null);
@@ -906,6 +909,12 @@ function ComposeFaxDialog({ onClose, onSent, onOpenTemplates }: { onClose: () =>
               ) : (
                 <TemplatePicker value={template} onChange={setTemplate} onOpenTemplates={onOpenTemplates} />
               )}
+
+              <CoverFields
+                attention={attention} subject={subject} message={message}
+                onAttention={setAttention} onSubject={setSubject} onMessage={setMessage}
+                previewTitle={coverTab === "custom" ? template : "Sangoma standard cover page"}
+              />
             </div>
           )}
         </div>
@@ -916,6 +925,71 @@ function ComposeFaxDialog({ onClose, onSent, onOpenTemplates }: { onClose: () =>
         <button onClick={send} disabled={!canSend} className="btn-primary px-6 py-2.5 rounded-xl text-[13px] font-bold uppercase tracking-wider disabled:opacity-40 disabled:cursor-not-allowed" style={{ backgroundColor: "var(--th-fax-cta-bg)", color: "var(--th-fax-cta-text)" }}>Send fax</button>
       </div>
     </DialogShell>
+  );
+}
+
+/* The wording that changes with every fax.  It sits below whichever cover the
+   user picked, because both the built-in cover and a saved template are only
+   stationery — the words are typed here.  (Figma 8635-9600 / 8635-9976) */
+function CoverFields({
+  attention, subject, message, onAttention, onSubject, onMessage, previewTitle,
+}: {
+  attention: string; subject: string; message: string;
+  onAttention: (v: string) => void; onSubject: (v: string) => void; onMessage: (v: string) => void;
+  previewTitle: string;
+}) {
+  const [preview, setPreview] = useState(false);
+  return (
+    <div className="space-y-3.5">
+      <div>
+        <FieldLabel>Attention</FieldLabel>
+        <input value={attention} onChange={(e) => onAttention(e.target.value)} placeholder="Who is this for?" className="w-full px-4 py-2.5 rounded-xl text-[14px] outline-none placeholder:text-[#9AA3AB]" style={inputStyle} />
+      </div>
+      <div>
+        <FieldLabel>Subject</FieldLabel>
+        <input value={subject} onChange={(e) => onSubject(e.target.value)} placeholder="Write a subject here" className="w-full px-4 py-2.5 rounded-xl text-[14px] outline-none placeholder:text-[#9AA3AB]" style={inputStyle} />
+      </div>
+      <div>
+        <FieldLabel>Message</FieldLabel>
+        <textarea value={message} onChange={(e) => onMessage(e.target.value)} rows={3} placeholder="Write a short message for the cover sheet…" className="w-full px-4 py-2.5 rounded-xl text-[14px] outline-none resize-none placeholder:text-[#9AA3AB]" style={inputStyle} />
+      </div>
+      <button onClick={() => setPreview((p) => !p)} className="w-full py-3 rounded-xl flex items-center justify-center gap-2 text-[13px] font-semibold transition-opacity hover:opacity-80" style={{ backgroundColor: "var(--th-bg-hover)", color: "var(--th-text-primary)" }}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
+        {preview ? "Hide preview" : "Preview fax"}
+      </button>
+      {preview && <CoverSheetPreview attention={attention} subject={subject || previewTitle} message={message} />}
+    </div>
+  );
+}
+
+function CoverSheetPreview({ attention, subject, message }: { attention: string; subject: string; message: string }) {
+  const row = (k: string, v: string) => (
+    <div className="flex gap-2 py-0.5">
+      <span className="font-bold w-[52px] shrink-0">{k}</span>
+      <span className="truncate">{v}</span>
+    </div>
+  );
+  return (
+    <div className="rounded-xl p-8" style={{ backgroundColor: "#fff", border: "1px solid var(--th-border)" }}>
+      <div className="flex items-center gap-3 pb-6">
+        <span className="px-2.5 py-1 rounded text-[10px] font-bold tracking-wider text-white" style={{ backgroundColor: "#22262B" }}>SANGOMA</span>
+        <span className="text-[11px]" style={{ color: "#3C4650" }}>Scalable Cloud Communications</span>
+      </div>
+      <div className="grid grid-cols-2 gap-x-4 text-[9px] border-t border-b py-2" style={{ borderColor: "#22262B", color: "#22262B" }}>
+        {row("From:", "(555) 555-5555")}
+        {row("To:", "(555) 555-5555")}
+        {row("Sender:", "Billing Folks")}
+        {row("Attention:", attention || "—")}
+        {row("Company:", "EasyGoing Inc.")}
+        {row("Date:", "10/21/2015")}
+        {row("Subject:", subject || "—")}
+        {row("Pages:", "1")}
+      </div>
+      <div className="mt-2 text-[9px]" style={{ color: "#22262B" }}>
+        <p className="font-bold">Message:</p>
+        <p className="mt-1 pl-3">{message || "—"}</p>
+      </div>
+    </div>
   );
 }
 
@@ -989,6 +1063,9 @@ function ForwardFaxDialog({ fax, onClose, onForward, onOpenTemplates }: { fax: F
   const [cover, setCover] = useState(false);
   const [coverTab, setCoverTab] = useState<"default" | "custom">("default");
   const [template, setTemplate] = useState("Cover for legal");
+  const [attention, setAttention] = useState("Legal Team");
+  const [subject, setSubject] = useState("");
+  const [message, setMessage] = useState("");
 
   const forward = () => {
     const pending = recipInput.trim();
@@ -1052,6 +1129,12 @@ function ForwardFaxDialog({ fax, onClose, onForward, onOpenTemplates }: { fax: F
               ) : (
                 <TemplatePicker value={template} onChange={setTemplate} onOpenTemplates={onOpenTemplates} />
               )}
+
+              <CoverFields
+                attention={attention} subject={subject} message={message}
+                onAttention={setAttention} onSubject={setSubject} onMessage={setMessage}
+                previewTitle={coverTab === "custom" ? template : fax.subject}
+              />
             </div>
           )}
         </div>
