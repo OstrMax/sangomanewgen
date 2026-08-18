@@ -9,7 +9,7 @@ type Tpl = { id: string; name: string; header: boolean; footer: boolean };
 
 const seedTemplates: Tpl[] = [
   { id: "legal", name: "Cover for legal", header: true, footer: false },
-  { id: "medical", name: "Cover for medical", header: true, footer: false },
+  { id: "medical", name: "Cover for medical", header: true, footer: true },
 ];
 
 /* `openTemplate` names the cover sheet a fax dialog wants opened, landing the
@@ -35,17 +35,23 @@ export default function FaxSettingsDialog({ onClose, openTemplate, returnTo }: {
   /* cover sheet state */
   const [templates, setTemplates] = useState<Tpl[]>(seedTemplates);
   const [currentId, setCurrentId] = useState<string>(seedTemplates.find((t) => t.name === openTemplate)?.id ?? seedTemplates[0].id);
-  const [mode, setMode] = useState<"edit" | "new" | "preview">("edit");
+  const [mode, setMode] = useState<"edit" | "new">("edit");
+  /* Previewing sits *on top of* whichever mode you were in, so backing out of it
+     returns to the same template — a saved one or the draft you were writing. */
+  const [previewing, setPreviewing] = useState(false);
   const [draftName, setDraftName] = useState("");
-  const [draft, setDraft] = useState<Omit<Tpl, "id" | "name">>({ header: true, footer: false });
+  const [draft, setDraft] = useState<Omit<Tpl, "id" | "name">>({ header: false, footer: false });
 
   const current = templates.find((t) => t.id === currentId);
 
   /* Only the deep-linked dialog gets a task-specific title — opened from the
      gear it is just the settings screen. */
-  const headerTitle = !openTemplate ? "Fax settings" : mode === "new" ? "New custom template" : mode === "preview" ? "Cover sheet preview" : `Edit “${current?.name ?? "template"}”`;
+  const headerTitle = !openTemplate ? "Fax settings" : previewing ? "Cover sheet preview" : mode === "new" ? "New custom template" : `Edit “${current?.name ?? "template"}”`;
 
   const editing = mode === "new" ? { name: draftName, ...draft } : { name: current?.name ?? "", header: current?.header ?? true, footer: current?.footer ?? false };
+  /* One piece of artwork is already worth looking at — only a completely empty
+     sheet has nothing to show. */
+  const canPreview = editing.header || editing.footer;
 
   const patch = (p: Partial<Omit<Tpl, "id" | "name">>) => {
     if (mode === "new") setDraft((d) => ({ ...d, ...p }));
@@ -54,7 +60,8 @@ export default function FaxSettingsDialog({ onClose, openTemplate, returnTo }: {
 
   const startNew = () => {
     setDraftName("");
-    setDraft({ header: true, footer: false });
+    setDraft({ header: false, footer: false });
+    setPreviewing(false);
     setMode("new");
   };
 
@@ -168,8 +175,8 @@ export default function FaxSettingsDialog({ onClose, openTemplate, returnTo }: {
               <>
                 <SectionHead title="Cover sheet" sub="Choose or edit your custom cover sheets" />
 
-                {mode === "preview" ? (
-                  <CoverPreview name={editing.name || draftName} />
+                {previewing ? (
+                  <CoverPreview name={editing.name} header={editing.header} footer={editing.footer} />
                 ) : templates.length === 0 && mode !== "new" ? (
                   <div className="flex flex-col items-center justify-center text-center py-14">
                     <div className="flex items-center justify-center w-12 h-12 rounded-xl mb-4" style={{ backgroundColor: "var(--th-bg-hover)" }}>
@@ -189,15 +196,21 @@ export default function FaxSettingsDialog({ onClose, openTemplate, returnTo }: {
                     {mode === "new" ? (
                       <>
                         {/* Back out of authoring only once there is a list to go
-                            back to — on a first template it would lead nowhere. */}
-                        <div className="flex items-center gap-3">
+                            back to — on a first template it would lead nowhere.
+                            A quiet text link above the title, matching the one in
+                            the dialog header, so it reads as navigation. */}
+                        <div className="space-y-1.5">
                           {templates.length > 0 && (
-                            <button onClick={() => setMode("edit")} className="flex items-center gap-1 text-[12px] font-semibold transition-opacity hover:opacity-70 hover:underline underline-offset-2" style={{ color: "#142B53" }}>
+                            <button
+                              onClick={() => setMode("edit")}
+                              className="flex items-center gap-1 text-[12px] font-semibold transition-opacity hover:opacity-70 hover:underline underline-offset-2"
+                              style={{ color: "#142B53" }}
+                            >
                               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className="shrink-0"><line x1="19" y1="12" x2="5" y2="12" /><polyline points="11 18 5 12 11 6" /></svg>
-                              Back
+                              Back to my templates
                             </button>
                           )}
-                          <p className="text-[13px] font-bold" style={{ color: "var(--th-text-primary)" }}>New custom template</p>
+                          <p className="text-[15px] font-bold" style={{ color: "var(--th-text-primary)" }}>New custom template</p>
                         </div>
                         <Field label="Template name">
                           <input value={draftName} onChange={(e) => setDraftName(e.target.value)} placeholder="e.g. Cover for legal" className="w-full px-4 py-2.5 rounded-xl text-[14px] outline-none placeholder:text-[#9AA3AB]" style={inputStyle} />
@@ -234,10 +247,25 @@ export default function FaxSettingsDialog({ onClose, openTemplate, returnTo }: {
                       <span className="font-bold" style={{ color: "var(--th-text-primary)" }}>Please note:</span> (Header and footer images must be 1500px x 500px max, PNG/JPG only)
                     </p>
 
-                    <button onClick={() => setMode("preview")} className="w-full py-2.5 rounded-xl flex items-center justify-center gap-1.5 text-[13px] font-semibold border border-dashed transition-colors hover:opacity-80" style={{ backgroundColor: "var(--th-bg-hover)", borderColor: "var(--th-border)", color: "var(--th-text-primary)" }}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
-                      Preview cover sheet
-                    </button>
+                    {/* An empty sheet has nothing to preview, so the button stays
+                        out of reach and says what is missing. */}
+                    <div>
+                      <button
+                        onClick={() => setPreviewing(true)}
+                        disabled={!canPreview}
+                        data-tip={canPreview ? undefined : "Upload a header or footer image first"}
+                        className={`w-full py-2.5 rounded-xl flex items-center justify-center gap-1.5 text-[13px] font-semibold border border-dashed transition-colors ${canPreview ? "hover:opacity-80" : "cursor-not-allowed"}`}
+                        style={{ backgroundColor: "var(--th-bg-hover)", borderColor: "var(--th-border)", color: canPreview ? "var(--th-text-primary)" : "var(--th-text-muted)", opacity: canPreview ? 1 : 0.6 }}
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
+                        Preview cover sheet
+                      </button>
+                      {!canPreview && (
+                        <p className="text-[11px] mt-1.5 text-center" style={{ color: "var(--th-text-muted)" }}>
+                          Add a header or footer image to preview this cover sheet.
+                        </p>
+                      )}
+                    </div>
 
                     {/* Only an existing template can be deleted — in create mode
                         there is nothing saved yet, and Cancel already backs out. */}
@@ -256,8 +284,11 @@ export default function FaxSettingsDialog({ onClose, openTemplate, returnTo }: {
 
         {/* Footer */}
         <div className="flex items-center justify-end gap-4 px-6 py-4 border-t shrink-0" style={{ borderColor: "var(--th-border)", backgroundColor: "var(--th-bg-hover)" }}>
-          {mode === "preview" ? (
-            <button onClick={() => setMode(templates.some((t) => t.id === currentId) && draftName === "" ? "edit" : "new")} className="btn-primary px-5 py-2.5 rounded-xl text-[13px] font-bold uppercase tracking-wider" style={{ backgroundColor: "#142B53", color: "#fff" }}>Back to edit</button>
+          {previewing ? (
+            <button onClick={() => setPreviewing(false)} className="flex items-center gap-1.5 text-[13px] font-bold uppercase tracking-wider transition-opacity hover:opacity-70" style={{ color: "var(--th-text-secondary)" }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12" /><polyline points="11 18 5 12 11 6" /></svg>
+              Back to edit
+            </button>
           ) : (
             <div className="flex items-center gap-4">
               <button onClick={onClose} className="text-[13px] font-bold uppercase tracking-wider" style={{ color: "var(--th-text-secondary)" }}>Cancel</button>
@@ -388,13 +419,12 @@ function ImageSlot({ filled, onToggle }: { filled: boolean; onToggle: () => void
 /* The stationery, filled with sample wording — the real attention, subject and
    message are typed per fax in the send dialog, so they can only be stand-ins
    here. */
-function CoverPreview({ name }: { name: string }) {
+function CoverPreview({ name, header, footer }: { name: string; header: boolean; footer: boolean }) {
   return (
     <div className="rounded-xl mx-auto max-w-[420px] p-10" style={{ backgroundColor: "#fff", border: "1px solid var(--th-border)", boxShadow: "0 2px 10px rgba(0,0,0,0.06)" }}>
-      <div className="flex items-center gap-3 pb-8">
-        <span className="px-2.5 py-1 rounded text-[10px] font-bold tracking-wider text-white" style={{ backgroundColor: "#22262B" }}>SANGOMA</span>
-        <span className="text-[11px]" style={{ color: "#3C4650" }}>Scalable Cloud Communications</span>
-      </div>
+      {/* Only the artwork that was actually uploaded shows up, so the preview
+          never promises a band that won't be printed. */}
+      {header ? <PreviewBand className="pb-8" /> : <div className="pb-4" />}
       <div className="grid grid-cols-2 gap-x-4 text-[9px] border-t border-b py-2" style={{ borderColor: "#22262B", color: "#22262B" }}>
         <PreviewRow k="From:" v="(555) 555-5555" />
         <PreviewRow k="To:" v="(555) 555-5555" />
@@ -409,10 +439,16 @@ function CoverPreview({ name }: { name: string }) {
         <p className="font-bold">Message:</p>
         <p className="mt-1 pl-3">Your payment is due in 5 days</p>
       </div>
-      <div className="flex items-center gap-3 pt-16">
-        <span className="px-2.5 py-1 rounded text-[10px] font-bold tracking-wider text-white" style={{ backgroundColor: "#22262B" }}>SANGOMA</span>
-        <span className="text-[11px]" style={{ color: "#3C4650" }}>Scalable Cloud Communications</span>
-      </div>
+      {footer ? <PreviewBand className="pt-16" /> : <div className="pt-10" />}
+    </div>
+  );
+}
+
+function PreviewBand({ className }: { className: string }) {
+  return (
+    <div className={`flex items-center gap-3 ${className}`}>
+      <span className="px-2.5 py-1 rounded text-[10px] font-bold tracking-wider text-white" style={{ backgroundColor: "#22262B" }}>SANGOMA</span>
+      <span className="text-[11px]" style={{ color: "#3C4650" }}>Scalable Cloud Communications</span>
     </div>
   );
 }

@@ -75,10 +75,12 @@ export default function FaxPage() {
 
   // dialogs / overlays
   const [compose, setCompose] = useState<null | { mode: "new" }>(null);
-  const [forwardFax, setForwardFax] = useState<FaxItem | null>(null);
+  /* Forward and retry are the same dialog — a retry is just a forward that
+     starts out addressed back to the number the fax failed to reach. */
+  const [forwardFax, setForwardFax] = useState<null | { fax: FaxItem; retry: boolean }>(null);
   /* Which fax dialog sent the user to Fax settings (so we can label the way
      back) and which template it wanted opened. */
-  const [templateEditor, setTemplateEditor] = useState<null | { from: "New fax" | "Forward fax"; name: string }>(null);
+  const [templateEditor, setTemplateEditor] = useState<null | { from: "New fax" | "Forward fax" | "Retry fax"; name: string }>(null);
   const [showNewFolder, setShowNewFolder] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [moveMenu, setMoveMenu] = useState(false);
@@ -432,10 +434,12 @@ export default function FaxPage() {
         {selected ? (
           <>
             {/* Preview header */}
-            <div className="px-6 py-4 flex items-start justify-between" style={{ borderBottom: "1px solid var(--th-border)" }}>
-              <div className="flex-1 min-w-0">
+            {/* The action group wraps onto its own line rather than squeezing the
+                number, which a labelled Retry would otherwise break in half. */}
+            <div className="px-6 py-4 flex items-start justify-between gap-x-4 gap-y-3 flex-wrap" style={{ borderBottom: "1px solid var(--th-border)" }}>
+              <div className="flex-1 min-w-[300px]">
                 <div className="flex items-center gap-2 mb-1 relative">
-                  <h2 className="text-lg font-bold" style={{ color: "var(--th-text-primary)" }}>{selected.number}</h2>
+                  <h2 className="text-lg font-bold whitespace-nowrap truncate" style={{ color: "var(--th-text-primary)" }}>{selected.number}</h2>
                   <button onClick={() => setKebabOpen((v) => !v)} className="btn-icon w-6 h-6 flex items-center justify-center rounded-md">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--th-text-secondary)" stroke="none"><circle cx="12" cy="5" r="1.6" /><circle cx="12" cy="12" r="1.6" /><circle cx="12" cy="19" r="1.6" /></svg>
                   </button>
@@ -454,9 +458,24 @@ export default function FaxPage() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-1 shrink-0">
+              <div className="flex items-center gap-1 shrink-0 ml-auto">
                 <IconBtn tip="Save a fax" onClick={() => fireToast("Fax saved", "Your fax was saved to Downloads folder")}><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></IconBtn>
-                <IconBtn tip="Forward" onClick={() => setForwardFax(selected)}><polyline points="15 17 20 12 15 7" /><path d="M4 18v-2a4 4 0 014-4h12" /></IconBtn>
+                {/* A fax that never arrived doesn't need forwarding, it needs
+                    sending again — so the same dialog surfaces as a labelled
+                    Retry, pre-addressed to the number that failed. */}
+                {selected.status === "failed" ? (
+                  <button
+                    onClick={() => setForwardFax({ fax: selected, retry: true })}
+                    className="btn-primary flex items-center gap-1.5 px-3 py-2 rounded-lg text-[12px] font-bold uppercase tracking-wider"
+                    style={{ backgroundColor: "var(--th-fax-cta-bg)", color: "var(--th-fax-cta-text)" }}
+                    data-tip="Send this fax again"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10" /><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10" /></svg>
+                    Retry
+                  </button>
+                ) : (
+                  <IconBtn tip="Forward" onClick={() => setForwardFax({ fax: selected, retry: false })}><polyline points="15 17 20 12 15 7" /><path d="M4 18v-2a4 4 0 014-4h12" /></IconBtn>
+                )}
                 <IconBtn tip="Move to folder" onClick={() => setMoveMenu(true)}><path d="M3 7h6l2 2h10v10a1 1 0 01-1 1H3a1 1 0 01-1-1V7a1 1 0 011-1z" /></IconBtn>
                 <IconBtn tip="Delete" danger onClick={() => setConfirmDelete({ kind: "single", fax: selected })}><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" /></IconBtn>
                 {moveMenu && !checkedIds.size && (
@@ -471,11 +490,10 @@ export default function FaxPage() {
             <div className="flex-1 overflow-y-auto p-8" style={{ backgroundColor: "var(--th-bg-hover)" }}>
               <div className="max-w-[620px] mx-auto space-y-5">
                 {Array.from({ length: Math.min(selected.pages, 4) }).map((_, i) => (
+                  /* No per-sheet "Page 1 of 4" caption — the count already sits in
+                     the header above and on every row of the list, and repeating it
+                     on the paper competes with the fax's own content. */
                   <div key={i} className="rounded-lg shadow-sm p-12 aspect-[8.5/11]" style={{ backgroundColor: "#FFFFFF", border: "1px solid var(--th-border)" }}>
-                    <div className="text-center mb-8">
-                      <div className="text-[10px] uppercase tracking-[1.5px] mb-2" style={{ color: "#9AA3AB" }}>Page {i + 1} of {selected.pages}</div>
-                      <div className="h-px w-16 mx-auto" style={{ backgroundColor: "#E5E6E8" }} />
-                    </div>
                     <div className="space-y-4 text-[13px]" style={{ color: "#4C5863" }}>
                       <p className="font-bold text-[15px]" style={{ color: "#001221" }}>{selected.subject}</p>
                       <p>{selected.preview}</p>
@@ -499,7 +517,7 @@ export default function FaxPage() {
             <BulkBtn label="Move" onClick={() => setMoveMenu((v) => !v)} icon={<><path d="M3 7h6l2 2h10v10a1 1 0 01-1 1H3a1 1 0 01-1-1V7a1 1 0 011-1z" /></>} />
             {moveMenu && <MoveToMenu folders={folders.filter((f) => f.kind === "custom")} onPick={(name) => { setMoveMenu(false); clearChecks(); fireToast("Fax moved", `Moved to “${name}”`); }} onCreate={() => { setMoveMenu(false); setShowNewFolder(true); }} anchor="up" />}
           </div>
-          <BulkBtn label="Forward" onClick={() => { const f = faxes.find((x) => checkedIds.has(x.id)); if (f) setForwardFax(f); }} icon={<><polyline points="15 17 20 12 15 7" /><path d="M4 18v-2a4 4 0 014-4h12" /></>} />
+          <BulkBtn label="Forward" onClick={() => { const f = faxes.find((x) => checkedIds.has(x.id)); if (f) setForwardFax({ fax: f, retry: false }); }} icon={<><polyline points="15 17 20 12 15 7" /><path d="M4 18v-2a4 4 0 014-4h12" /></>} />
           <BulkBtn label="Save" onClick={() => { const n = checkedIds.size; clearChecks(); fireToast("Fax saved", n > 1 ? `${n} faxes were saved to Downloads folder` : "Your fax was saved to Downloads folder"); }} icon={<><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></>} />
           <BulkBtn label="Delete" danger onClick={() => setConfirmDelete({ kind: "bulk", count: checkedIds.size })} icon={<><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6" /></>} />
           <button onClick={clearChecks} className="w-7 h-7 flex items-center justify-center rounded-lg transition-colors hover:bg-white/10">
@@ -510,7 +528,20 @@ export default function FaxPage() {
 
       {/* ───────── Dialogs / overlays ───────── */}
       {compose && <ComposeFaxDialog onClose={() => setCompose(null)} onSent={(sub, sub2) => { setCompose(null); fireToast("Fax sent", sub2); }} onOpenTemplates={(name) => setTemplateEditor({ from: "New fax", name })} />}
-      {forwardFax && <ForwardFaxDialog fax={forwardFax} onClose={() => setForwardFax(null)} onForward={(to) => { setForwardFax(null); fireToast("Fax forwarded", `Your fax was forwarded to ${to}`); }} onOpenTemplates={(name) => setTemplateEditor({ from: "Forward fax", name })} />}
+      {forwardFax && (
+        <ForwardFaxDialog
+          fax={forwardFax.fax}
+          retry={forwardFax.retry}
+          onClose={() => setForwardFax(null)}
+          onForward={(to) => {
+            const retry = forwardFax.retry;
+            setForwardFax(null);
+            if (retry) fireToast("Fax queued for retry", `We're sending your fax to ${to} again`);
+            else fireToast("Fax forwarded", `Your fax was forwarded to ${to}`);
+          }}
+          onOpenTemplates={(name) => setTemplateEditor({ from: forwardFax.retry ? "Retry fax" : "Forward fax", name })}
+        />
+      )}
       {templateEditor && <FaxSettingsDialog openTemplate={templateEditor.name} returnTo={templateEditor.from} onClose={() => setTemplateEditor(null)} />}
       {showNewFolder && <NewFolderDialog onClose={() => setShowNewFolder(false)} onCreate={createFolder} />}
       {renameFolder && <RenameFolderDialog folder={renameFolder} onClose={() => setRenameFolder(null)} onRename={(name) => doRenameFolder(renameFolder.id, name)} />}
@@ -602,7 +633,7 @@ function StatusBadge({ status }: { status: FaxStatus }) {
     failed: { label: "Failed", color: "#EF4444", bg: "rgba(239,68,68,0.12)", icon: <><circle cx="12" cy="12" r="9" /><line x1="15" y1="9" x2="9" y2="15" /><line x1="9" y1="9" x2="15" y2="15" /></> },
   }[status];
   return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider" style={{ color: cfg.color, backgroundColor: cfg.bg }}>
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider shrink-0" style={{ color: cfg.color, backgroundColor: cfg.bg }}>
       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">{cfg.icon}</svg>
       {cfg.label}
     </span>
@@ -1055,10 +1086,12 @@ function Select({ value, onChange, options }: { value: string; onChange: (v: str
 /* ── Forward — single-dialog inline flow (Figma node 8585-68171) ──
    From → Recipients → Forwarding (original fax) → "Include a cover sheet"
    toggle.  Turning it on expands Default cover / Custom template inline.
-   Custom template only *picks* a template — editing lives in Fax settings. */
-function ForwardFaxDialog({ fax, onClose, onForward, onOpenTemplates }: { fax: FaxItem; onClose: () => void; onForward: (to: string) => void; onOpenTemplates: (name: string) => void }) {
+   Custom template only *picks* a template — editing lives in Fax settings.
+   `retry` reuses the whole flow for a failed fax: same fields, but addressed
+   back to the original number and worded as a resend. */
+function ForwardFaxDialog({ fax, retry, onClose, onForward, onOpenTemplates }: { fax: FaxItem; retry?: boolean; onClose: () => void; onForward: (to: string) => void; onOpenTemplates: (name: string) => void }) {
   const [from, setFrom] = useState(senderNumbers[0]);
-  const [chips, setChips] = useState<string[]>([]);
+  const [chips, setChips] = useState<string[]>(retry ? [fax.number] : []);
   const [recipInput, setRecipInput] = useState("");
   const [cover, setCover] = useState(false);
   const [coverTab, setCoverTab] = useState<"default" | "custom">("default");
@@ -1077,19 +1110,19 @@ function ForwardFaxDialog({ fax, onClose, onForward, onOpenTemplates }: { fax: F
 
   return (
     <DialogShell onClose={onClose} width={560}>
-      <DialogHeader title="Forward fax. Recipients & cover sheet" onClose={onClose} />
+      <DialogHeader title={retry ? "Retry fax. Recipients & cover sheet" : "Forward fax. Recipients & cover sheet"} onClose={onClose} />
       <div className="px-6 py-5 overflow-y-auto flex-1">
         <div className="space-y-5">
           <div><FieldLabel hint="(personal fax number)">From</FieldLabel><Select value={from} onChange={setFrom} options={senderNumbers} /></div>
           <div><FieldLabel required>Recipients</FieldLabel><RecipientInput chips={chips} onAdd={(v) => setChips([...chips, v])} onRemove={(i) => setChips(chips.filter((_, j) => j !== i))} value={recipInput} onValueChange={setRecipInput} /></div>
 
           <div>
-            <FieldLabel hint="(original fax)">Forwarding</FieldLabel>
+            <FieldLabel hint={retry ? "(delivery failed)" : "(original fax)"}>{retry ? "Resending" : "Forwarding"}</FieldLabel>
             <div className="flex items-center gap-3 p-3.5 rounded-xl" style={{ backgroundColor: "rgba(122,90,248,0.06)", border: "1px solid var(--th-border)" }}>
               <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: "var(--th-bg-hover)" }}><PrinterIcon /></div>
               <div className="flex-1 min-w-0">
                 <div className="text-[13px] font-bold truncate" style={{ color: "var(--th-text-primary)" }}>{fax.subject}</div>
-                <div className="text-[12px]" style={{ color: "var(--th-text-muted)" }}>From: {fax.number}</div>
+                <div className="text-[12px]" style={{ color: "var(--th-text-muted)" }}>{retry ? "To" : "From"}: {fax.number}</div>
               </div>
               <span className="px-2.5 py-1 rounded-md text-[11px] font-bold shrink-0" style={{ backgroundColor: "rgba(122,90,248,0.12)", color: "#7A5AF8" }}>{fax.pages} pages</span>
             </div>
@@ -1141,7 +1174,7 @@ function ForwardFaxDialog({ fax, onClose, onForward, onOpenTemplates }: { fax: F
       </div>
       <div className="flex items-center justify-end gap-4 px-6 py-4 border-t shrink-0" style={{ borderColor: "var(--th-border)" }}>
         <button onClick={onClose} className="text-[13px] font-bold uppercase tracking-wider" style={{ color: "var(--th-text-secondary)" }}>Cancel</button>
-        <button onClick={forward} disabled={chips.length === 0 && !recipInput.trim()} className="btn-primary px-6 py-2.5 rounded-xl text-[13px] font-bold uppercase tracking-wider disabled:opacity-40 disabled:cursor-not-allowed" style={{ backgroundColor: "var(--th-fax-cta-bg)", color: "var(--th-fax-cta-text)" }}>Forward fax</button>
+        <button onClick={forward} disabled={chips.length === 0 && !recipInput.trim()} className="btn-primary px-6 py-2.5 rounded-xl text-[13px] font-bold uppercase tracking-wider disabled:opacity-40 disabled:cursor-not-allowed" style={{ backgroundColor: "var(--th-fax-cta-bg)", color: "var(--th-fax-cta-text)" }}>{retry ? "Retry fax" : "Forward fax"}</button>
       </div>
     </DialogShell>
   );
